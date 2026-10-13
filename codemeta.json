@@ -6,8 +6,9 @@
   "author": [
     {
       "@type": "Person",
-      "givenName": "Christoph",
-      "familyName": "Mahnke"
+      "givenName": "Christian",
+      "familyName": "Mahnke",
+      "@id": "https://orcid.org/0009-0003-1361-4159"
     }
   ],
   "license": "MIT",

@@ -7,6 +7,8 @@ code-citation-lint [lint] [options] [targets...]
 code-citation-lint convert [options] <input> <output>
 code-citation-lint init [dir] [--force]
 code-citation-lint list-versions
+code-citation-lint list-rules [-f text|json]
+code-citation-lint --version
 ```
 
 ## lint
@@ -110,6 +112,21 @@ code-citation-lint init [dir] [--force]
 ## list-versions
 
 Prints all supported schema versions (CFF, CodeMeta and the schema.org profile).
+
+## list-rules
+
+Prints the full rule catalog with default severities — the same content as [rules.md](rules.md):
+
+```console
+code-citation-lint list-rules
+code-citation-lint list-rules -f json
+```
+
+`-f json` prints the catalog as an array of `{rule, group, severity, description}` objects. All rule ids can be disabled or re-severitized via `--rules`.
+
+## Package version
+
+`code-citation-lint --version` (or `-V`) prints the package version. It must be the only argument, because the `lint` subcommand uses `-v/--version` for schema version forcing.
 
 ## Exit codes
 

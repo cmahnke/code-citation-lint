@@ -5,8 +5,8 @@ import {lintCodeMetaObject} from '../../src/codemeta/lint.js'
 
 describe('parseAuthor', () => {
   it('parses npm author strings and objects', () => {
-    expect(parseAuthor('Christoph Mahnke <christoph@example.org> (https://example.org/~cm)')).toEqual({
-      name: 'Christoph Mahnke',
+    expect(parseAuthor('Christian Mahnke <christoph@example.org> (https://example.org/~cm)')).toEqual({
+      name: 'Christian Mahnke',
       email: 'christoph@example.org',
       url: 'https://example.org/~cm'
     })
@@ -28,7 +28,7 @@ describe('scaffoldFromPackageJson', () => {
     version: '1.2.3',
     license: 'MIT',
     keywords: ['demo'],
-    author: 'Christoph Mahnke <christoph@example.org>',
+    author: 'Christian Mahnke <christoph@example.org>',
     repository: {type: 'git', url: 'git+https://github.com/org/demo-tool.git'},
     homepage: 'https://example.org'
   })
@@ -60,7 +60,7 @@ describe('scaffoldFromPackageJson', () => {
   })
 
   it('strips git+ and .git from repository urls and splits author names', () => {
-    expect(scaffold.cff).toContain('given-names: Christoph')
+    expect(scaffold.cff).toContain('given-names: Christian')
     expect(scaffold.cff).toContain('family-names: Mahnke')
     expect(scaffold.cff).toContain('repository-code: https://github.com/org/demo-tool')
     expect(scaffold.cff).not.toContain('git+')

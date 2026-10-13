@@ -6,7 +6,7 @@ Linter, validator, scaffolder and converter for **CodeMeta** (`codemeta.json`), 
 - Lints **schema.org** software documents (`SoftwareSourceCode`, `SoftwareApplication`, `Dataset`) against a strict curated profile
 - **Converts** CITATION.cff → CodeMeta (latest) / schema.org / Zenodo JSON, and codemeta.json → CITATION.cff — following the reference [cffconvert](https://github.com/citation-file-format/cffconvert) / [codemeta2cff](https://github.com/caltechlibrary/codemeta2cff) mappings, with information-loss issues
 - **Scaffolds** metadata files from `package.json` (`init`)
-- **Lint rules** beyond schema validation: recommended fields, ORCID/SPDX/date formats, cross-file consistency between `codemeta.json` and `CITATION.cff`
+- **Lint rules** beyond schema validation: recommended fields, ORCID format + check digits, SPDX license list, date formats, cross-file consistency between `codemeta.json` and `CITATION.cff` — see the [rule catalog](docs/rules.md) (`list-rules`)
 - Usable as a **library** (Node.js & browser), via a **CLI**, and in a hosted **web demo**
 - Detects document type and schema version automatically, with manual overrides
 
@@ -79,12 +79,60 @@ code-citation-lint init .
 
 # force the schema version, strict mode, JSON output
 code-citation-lint lint -v 1.2.0 -s -f json CITATION.cff
+
+# package version, supported schema versions, rule catalog
+code-citation-lint --version
+code-citation-lint list-versions
+code-citation-lint list-rules
 ```
 
 Convert output paths: `-` is stdout; an existing directory or trailing-slash path is a directory; a non-existing single-target path is an explicit file; multiple targets need a directory or `-` (extensionless paths are created, file-like `*.json` typo paths exit `2`).
 
 Exit codes: `0` clean (including `init` TODO warnings without errors), `1` findings (`--strict` also fails on warnings, conversions of invalid documents, unsupported conversion versions), `2` input/output errors (no lint targets, `--stdin` with targets, invalid `--format`/`--type`/`--to`/`--rules`, unknown options, missing arguments, input/target mismatches, empty-directory discovery, bad multi-target output, missing paths, fetch failures, read/write errors).
 See [docs/cli.md](docs/cli.md) for all options and [docs/convert.md](docs/convert.md) for the conversion mapping.
+
+## Global install and shell usage
+
+Install the CLI globally (Node.js 20+) to use it in any shell:
+
+```console
+npm install --global @projektemacher/code-citation-lint
+code-citation-lint --version
+```
+
+One-off use without installing: `npx @projektemacher/code-citation-lint`.
+
+### Linting a directory tree with find
+
+`lint` accepts any number of file targets, so `find` results pass straight through. `-exec … {} +` collects all matches into a single invocation and works with GNU and BSD (macOS) find alike:
+
+```console
+# lint every metadata file below content/post in one run
+find content/post \( -name 'codemeta.json' -o -name 'CITATION.cff' -o -name 'schemaorg.json' \) \
+  -exec code-citation-lint {} +
+```
+
+Equivalent, null-delimited through xargs (safe for filenames with spaces):
+
+```console
+find content/post \( -name 'codemeta.json' -o -name 'CITATION.cff' \) -print0 \
+  | xargs -0 code-citation-lint
+```
+
+Machine-readable for scripts — combined JSON report on stdout, and the exit code signals the result (`0` no errors, `1` errors — or warnings under `--strict`, `2` I/O errors):
+
+```console
+find content/post \( -name '*.codemeta.json' -o -name '*.cff' \) -print0 \
+  | xargs -0 code-citation-lint -f json
+```
+
+For files using the standard names, built-in recursive discovery does the same without `find` (and skips `node_modules`, `.git`, `dist`, …):
+
+```console
+code-citation-lint -r content/post
+```
+
+`find` is the better fit when files have unrecognized names (explicit targets are type-sniffed by content) or need filters `lint` doesn't offer (depth, mtime, `git ls-files`, …).
 
 ## Rule configuration
 
@@ -116,7 +164,8 @@ npm run format       # prettier --write .
 npm run typecheck    # tsc --noEmit
 npm run self-lint    # lints this repo's own codemeta.json + CITATION.cff
 npm run docs         # TypeDoc API reference -> docs/api
-npm run schemas:fetch    # re-fetch upstream schemas/contexts
+npm run docs:rules   # regenerate docs/rules.md from the rule catalog
+npm run schemas:fetch    # re-fetch upstream schemas/contexts/SPDX list
 npm run schemas:generate # regenerate CodeMeta JSON Schemas from contexts
 ```
 
@@ -129,4 +178,4 @@ This repository contains its own `codemeta.json` and `CITATION.cff`; both are va
 
 ## License
 
-[MIT](LICENSE) © Christoph Mahnke
+[MIT](LICENSE) © Christian Mahnke

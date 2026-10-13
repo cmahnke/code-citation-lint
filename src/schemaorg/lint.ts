@@ -5,6 +5,8 @@ import {createAjv} from '../ajv.js'
 import {addFinding, ajvErrorsToFindings, emptyResult, finalize, finding} from '../findings.js'
 import {parseDocument} from '../lint.js'
 import type {AjvError} from '../types.js'
+import {isSpdxId, spdxLicenseListVersion} from '../spdx.js'
+import {orcidProblem} from '../orcid.js'
 
 const compiled = new WeakMap<object, ValidateFunction>()
 
@@ -17,7 +19,6 @@ function getValidator(schema: object): ValidateFunction {
   return validate
 }
 
-const ORCID_PATTERN = /^https?:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/
 const SPDX_URL_PATTERN = /^https?:\/\/spdx\.org\/licenses\/[A-Za-z0-9+.-]+/
 const SPDX_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9+.-]*$/
 
@@ -58,9 +59,15 @@ function runSchemaOrgRules(document: Record<string, unknown>): LintFinding[] {
     agents.forEach((agent, index) => {
       if (agent === null || typeof agent !== 'object') return
       const id = (agent as Record<string, unknown>)['@id'] ?? (agent as Record<string, unknown>)['id']
-      if (typeof id === 'string' && /orcid\.org/i.test(id) && !ORCID_PATTERN.test(id)) {
+      if (typeof id !== 'string') return
+      const problem = orcidProblem(id)
+      if (problem === 'format') {
         findings.push(
           finding('warning', 'schemaorg/orcid-format', `ORCID "${id}" does not match https://orcid.org/XXXX-XXXX-XXXX-XXXX[9X].`, `/${field}/${index}/@id`)
+        )
+      } else if (problem === 'check-digit') {
+        findings.push(
+          finding('warning', 'schemaorg/orcid-format', `ORCID "${id}" does not pass the ORCID check digit (ISO 7064 MOD 11-2).`, `/${field}/${index}/@id`)
         )
       }
     })
@@ -74,6 +81,10 @@ function runSchemaOrgRules(document: Record<string, unknown>): LintFinding[] {
       findings.push(finding('info', 'schemaorg/license-spdx', `License "${license}" does not look like an SPDX identifier or SPDX URL.`))
     } else if (looksLikeUrl && !SPDX_URL_PATTERN.test(license) && !/licenses/.test(license)) {
       findings.push(finding('info', 'schemaorg/license-spdx', `License URL "${license}" is not an SPDX license URL; consider using one.`))
+    } else if (!looksLikeUrl && !isSpdxId(license)) {
+      findings.push(
+        finding('info', 'schemaorg/license-spdx', `License "${license}" is well-formed but not in the SPDX license list (v${spdxLicenseListVersion()}).`)
+      )
     }
   }
 

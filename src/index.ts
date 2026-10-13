@@ -11,6 +11,10 @@ export {lintCffContent, lintCffObject} from './cff/lint.js'
 export {lintCodeMetaContent, lintCodeMetaObject} from './codemeta/lint.js'
 export {lintSchemaOrgContent, lintSchemaOrgObject} from './schemaorg/lint.js'
 export {crossCheck} from './crosscheck.js'
+export {RULE_CATALOG, getRuleInfo, ruleIds} from './rules.js'
+export type {RuleGroup, RuleInfo} from './rules.js'
+export {orcidProblem, ORCID_PATTERN} from './orcid.js'
+export {isSpdxId, allSpdxIds, spdxLicenseListVersion} from './spdx.js'
 export {
   CFF_VERSIONS,
   CODEMETA_VERSIONS,

@@ -19,7 +19,7 @@ const SCHEMA_DIR = path.resolve(import.meta.dirname, '../schemas')
 interface Source {
   url: string
   target: string
-  transform?: 'pykwalify'
+  transform?: 'pykwalify' | 'spdx-ids'
   status?: 'released' | 'draft'
 }
 
@@ -80,6 +80,12 @@ const SOURCES: Source[] = [
     url: 'https://raw.githubusercontent.com/codemeta/codemeta/4.0/codemeta.jsonld',
     target: 'codemeta/4.0',
     status: 'released'
+  },
+  {
+    url: 'https://spdx.org/licenses/licenses.json',
+    target: 'spdx',
+    transform: 'spdx-ids',
+    status: 'released'
   }
 ]
 
@@ -98,7 +104,7 @@ async function main(): Promise<void> {
     await mkdir(targetDir, {recursive: true})
     const raw = await fetchText(source.url)
     const isYaml = source.transform === 'pykwalify'
-    const outFile = path.join(targetDir, isYaml ? 'schema.json' : path.basename(source.url))
+    const outFile = path.join(targetDir, isYaml ? 'schema.json' : source.transform === 'spdx-ids' ? 'ids.json' : path.basename(source.url))
     let content: string
     if (isYaml) {
       const converted = pykwalifyToJsonSchema(
@@ -106,6 +112,10 @@ async function main(): Promise<void> {
         `Citation File Format ${path.basename(source.target)} (converted from pykwalify)`
       )
       content = JSON.stringify(converted, null, 2) + '\n'
+    } else if (source.transform === 'spdx-ids') {
+      // Trim the SPDX list to what the linter needs: the list version and the bare ids.
+      const parsed = JSON.parse(raw) as {licenseListVersion: string; licenses: {licenseId: string}[]}
+      content = JSON.stringify({licenseListVersion: parsed.licenseListVersion, ids: parsed.licenses.map(entry => entry.licenseId)}, null, 2) + '\n'
     } else if (outFile.endsWith('.json')) {
       content = JSON.stringify(JSON.parse(raw), null, 2) + '\n'
     } else {

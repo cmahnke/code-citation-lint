@@ -8,10 +8,11 @@ import {convertContent, type ConvertTarget} from './convert.js'
 import {scaffoldFromPackageJson, minimalScaffold} from './scaffold.js'
 import {detectTypeAndVersion} from './detect.js'
 import {getVersions, normalizeVersion} from './registry.js'
+import {RULE_CATALOG} from './rules.js'
 import {stringify} from 'yaml'
 import type {Format, LintResult, RuleConfig, Severity} from './types.js'
 
-const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {name: string; description: string}
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {name: string; description: string; version: string}
 
 interface LintCliOptions {
   type: Format | 'auto'
@@ -502,6 +503,12 @@ function runInit(dir: string, options: InitCliOptions): void {
 }
 
 async function main(): Promise<void> {
+  // `lint` is the default command and owns `-v/--version <schema-version>`,
+  // so the package version must be handled before commander sees it.
+  if (process.argv.length === 3 && (process.argv[2] === '--version' || process.argv[2] === '-V')) {
+    console.log(pkg.version)
+    return
+  }
   const program = new Command()
     .name('code-citation-lint')
     .description(pkg.description)
@@ -583,10 +590,29 @@ async function main(): Promise<void> {
       }
     })
 
+  const listRules = program
+    .command('list-rules')
+    .description('list all lint rule ids with their default severities')
+    .option('-f, --format <format>', 'output format: text or json', parseFormat, 'text')
+    .action((rawOptions: {format: 'text' | 'json'}) => {
+      if (rawOptions.format === 'json') {
+        console.log(JSON.stringify(RULE_CATALOG, null, 2))
+        return
+      }
+      let currentGroup: string | undefined
+      for (const info of RULE_CATALOG) {
+        if (info.group !== currentGroup) {
+          currentGroup = info.group
+          console.log(`${currentGroup}:`)
+        }
+        console.log(`  ${info.rule} (${info.severity}) — ${info.description}`)
+      }
+    })
+
   // Commander argument errors (unknown options, invalid values, missing
   // arguments) throw instead of exiting, so the CLI can use exit code 2
   // consistently. Help/version output is still printed by commander.
-  for (const command of [program, lint, convert, initCommand, listVersions]) {
+  for (const command of [program, lint, convert, initCommand, listVersions, listRules]) {
     command.exitOverride()
   }
 

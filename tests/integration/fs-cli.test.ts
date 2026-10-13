@@ -1,6 +1,7 @@
 import {describe, expect, it} from 'vitest'
 import {execFileSync} from 'node:child_process'
-import {readFileSync} from 'node:fs'
+import {mkdtempSync, readFileSync, rmSync, writeFileSync} from 'node:fs'
+import {tmpdir} from 'node:os'
 import path from 'node:path'
 import {discover, lintDirectory, lintDiscovered} from '../../src/fs-io.js'
 
@@ -144,6 +145,58 @@ describe('CLI', () => {
       {allowFailure: true}
     )
     expect(status).toBe(0)
+  })
+
+  it('applies rule overrides via --rules @file', () => {
+    const dir = mkdtempSync(path.join(tmpdir(), 'ccl-rules-'))
+    const rulesFile = path.join(dir, 'rules.json')
+    writeFileSync(rulesFile, JSON.stringify({disable: ['cff/missing-license']}), 'utf8')
+    try {
+      const {status} = run(['--rules', `@${rulesFile}`, '-s', path.join(fixtures, 'cff/warnings.cff')], {allowFailure: true})
+      expect(status).toBe(0)
+    } finally {
+      rmSync(dir, {recursive: true, force: true})
+    }
+  })
+
+  it('prints the package version with --version', () => {
+    const {stdout, status} = run(['--version'])
+    expect(status).toBe(0)
+    expect(stdout).toMatch(/^\d+\.\d+\.\d+/)
+  })
+
+  it('prints the package version with -V', () => {
+    const {stdout, status} = run(['-V'])
+    expect(status).toBe(0)
+    expect(stdout).toMatch(/^\d+\.\d+\.\d+/)
+  })
+
+  it('keeps -v as the schema version option', () => {
+    const {stdout, status} = run(['-v', '1.1.0', path.join(fixtures, 'cff/valid-1.2.0.cff')], {allowFailure: true})
+    expect(status).toBe(1)
+    expect(stdout).toContain('validating against 1.1.0')
+  })
+
+  it('lists all rules as text', () => {
+    const {stdout, status} = run(['list-rules'])
+    expect(status).toBe(0)
+    expect(stdout).toContain('cff/parse')
+    expect(stdout).toContain('codemeta/orcid-format')
+    expect(stdout).toContain('general:')
+    expect(stdout).toContain('schema (error)')
+  })
+
+  it('lists all rules as JSON', () => {
+    const {stdout, status} = run(['list-rules', '-f', 'json'])
+    expect(status).toBe(0)
+    const parsed = JSON.parse(stdout) as {rule: string; group: string; severity: string; description: string}[]
+    expect(parsed.length).toBeGreaterThanOrEqual(40)
+    expect(parsed.some(info => info.rule === 'crosscheck/name-mismatch')).toBe(true)
+  })
+
+  it('rejects invalid list-rules formats', () => {
+    const {status} = run(['list-rules', '-f', 'yaml'], {allowFailure: true})
+    expect(status).toBe(2)
   })
 
   it('exits 2 for missing paths', () => {

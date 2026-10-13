@@ -39,7 +39,6 @@ Behavior:
 - converted CodeMeta/schema.org documents are linted; their warnings/infos and all information-loss issues are printed to stderr
 - the `zenodo` output has no bundled schema to lint against; its dropped keys are reported as issues
 - requested but unregistered `--codemeta-version`/`--cff-version` values fail explicitly with exit 1 instead of silently falling back to latest
-- requested but unregistered `--codemeta-version`/`--cff-version` values fail explicitly instead of silently falling back to latest
 - `<output>` is `-` (stdout), an explicit file path (single target), or a directory (created when missing; per-target file names: `codemeta.json`, `schemaorg.json`, `.zenodo.json`, `CITATION.cff`)
 - exit codes: `0` ok, `1` invalid input or converted output, `2` read/write errors or input/target mismatch
 

@@ -6,9 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- CLI `list-rules` subcommand printing the full rule catalog (text or `-f json`), with the generated catalog documented in `docs/rules.md` (`npm run docs:rules`)
+- ORCID check-digit validation: the `*/orcid-format` rules now also verify the ISO 7064 MOD 11-2 check digit of well-formed orcid.org URLs
+- SPDX license list validation: `*/license-spdx` rules report well-formed but unknown license ids against a vendored SPDX id list (`schemas/spdx/ids.json`, fetched by `npm run schemas:fetch`)
+- Library exports: `RULE_CATALOG`/`getRuleInfo`/`ruleIds`, `orcidProblem`/`ORCID_PATTERN`, `isSpdxId`/`allSpdxIds`/`spdxLicenseListVersion` (also from the `/browser` entry point)
+- CLI tests for `--rules @file`, GitHub URL resolution (branch fallback, repository expansion, blob URL rewriting) and the new subcommands
+
+### Fixed
+
+- `code-citation-lint --version` (and `-V`) prints the package version instead of failing with exit 2 — the flag was documented but not implemented (`-v/--version` as schema version forcing on `lint`/`convert` is unchanged)
+- Author metadata corrected: Christian Mahnke with ORCID `0009-0003-1361-4159` in package.json, codemeta.json, CITATION.cff, LICENSE and README
+
 ### Changed
 
-- CLI `lint` contract: no targets without `--stdin` prints an error/usage to stderr and exits `2`; `--stdin` with positional targets is rejected with exit `2`; `--format` is validated case-insensitively (`text`/`json`, otherwise `InvalidArgumentError`)
+- Removed the unused `normalizeCodeMetaVersion` alias from `src/codemeta/lint.ts` (it was never part of the public `index.ts` API)
+- CLI contract: no targets without `--stdin` prints an error/usage to stderr and exits `2`; `--stdin` with positional targets is rejected with exit `2`; `--format` is validated case-insensitively (`text`/`json`, otherwise `InvalidArgumentError`)
 - CLI `convert`: stdout carries only the serialized converted document(s); `# <target>` markers, `Wrote ...` messages, issues and failures go to stderr
 - CLI `convert` output paths: existing directories and trailing-slash paths are directories; non-existing single-target paths stay explicit files; multi-target outputs require a directory or `-` (extensionless paths are created, file-like `*.json` typo paths exit `2` without creating directories)
 - CLI `init`: `No package.json` and `Skipped existing file` messages go to stdout; errors stay on stderr; scaffolded `TODO` placeholders add `init/todo-placeholder` warnings to the self-check output

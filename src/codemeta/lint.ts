@@ -3,6 +3,8 @@ import {getSchema, getVersions, normalizeVersion} from '../registry.js'
 import {detectCodemetaVersion, detectTypeAndVersion} from '../detect.js'
 import {createAjv} from '../ajv.js'
 import {addFinding, ajvErrorsToFindings, emptyResult, finalize, finding} from '../findings.js'
+import {isSpdxId, spdxLicenseListVersion} from '../spdx.js'
+import {orcidProblem} from '../orcid.js'
 
 const compiled = new WeakMap<object, (data: unknown) => boolean>()
 
@@ -15,7 +17,6 @@ function getValidator(schema: object): (data: unknown) => boolean {
   return validate
 }
 
-const ORCID_PATTERN = /^https?:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/
 const SPDX_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9+.-]*$/
 const SPDX_URL_PATTERN = /^https?:\/\/spdx\.org\/licenses\/[A-Za-z0-9+.-]+/
 
@@ -80,9 +81,15 @@ function runCodeMetaRules(document: Record<string, unknown>, detectionDetail?: s
     agents.forEach((agent, index) => {
       if (agent === null || typeof agent !== 'object') return
       const id = (agent as Record<string, unknown>)['@id'] ?? (agent as Record<string, unknown>)['id']
-      if (typeof id === 'string' && /orcid\.org/i.test(id) && !ORCID_PATTERN.test(id)) {
+      if (typeof id !== 'string') return
+      const problem = orcidProblem(id)
+      if (problem === 'format') {
         findings.push(
           finding('warning', 'codemeta/orcid-format', `ORCID "${id}" does not match https://orcid.org/XXXX-XXXX-XXXX-XXXX[9X].`, `/${field}/${index}/@id`)
+        )
+      } else if (problem === 'check-digit') {
+        findings.push(
+          finding('warning', 'codemeta/orcid-format', `ORCID "${id}" does not pass the ORCID check digit (ISO 7064 MOD 11-2).`, `/${field}/${index}/@id`)
         )
       }
     })
@@ -96,6 +103,10 @@ function runCodeMetaRules(document: Record<string, unknown>, detectionDetail?: s
       findings.push(finding('info', 'codemeta/license-spdx', `License "${license}" does not look like an SPDX identifier.`))
     } else if (looksLikeUrl && !SPDX_URL_PATTERN.test(license)) {
       findings.push(finding('info', 'codemeta/license-spdx', `License URL "${license}" is not an SPDX license URL; consider using an SPDX identifier.`))
+    } else if (!looksLikeUrl && !isSpdxId(license)) {
+      findings.push(
+        finding('info', 'codemeta/license-spdx', `License "${license}" is well-formed but not in the SPDX license list (v${spdxLicenseListVersion()}).`)
+      )
     }
   }
 
@@ -184,6 +195,3 @@ export function lintCodeMetaContent(content: string, options: LintOptions = {}):
   }
   return lintCodeMetaObject(document, options)
 }
-
-/** Kept for API completeness: normalizes a version string for codemeta lookups. */
-export const normalizeCodeMetaVersion = normalizeVersion

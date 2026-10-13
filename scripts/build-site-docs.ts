@@ -27,6 +27,7 @@ const DOC_PAGES: DocPage[] = [
   {source: 'README.md', slug: 'readme', title: 'Readme'},
   {source: 'docs/library.md', slug: 'library', title: 'Library'},
   {source: 'docs/cli.md', slug: 'cli', title: 'CLI'},
+  {source: 'docs/rules.md', slug: 'rules', title: 'Rule catalog'},
   {source: 'docs/convert.md', slug: 'convert', title: 'Converting CITATION.cff'},
   {source: 'docs/schemas.md', slug: 'schemas', title: 'Schemas and versions'},
   {source: 'docs/page.md', slug: 'page', title: 'Browser demo page'}

@@ -77,6 +77,13 @@
       "url": "https://raw.githubusercontent.com/codemeta/codemeta/4.0/codemeta.jsonld",
       "status": "released",
       "fetched": "2026-10-12"
+    },
+    {
+      "target": "spdx",
+      "file": "ids.json",
+      "url": "https://spdx.org/licenses/licenses.json",
+      "status": "released",
+      "fetched": "2026-10-13"
     }
   ]
 }

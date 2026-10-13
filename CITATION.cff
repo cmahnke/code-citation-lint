@@ -3,8 +3,9 @@ message: If you use code-citation-lint in your research or tooling, please cite 
 title: code-citation-lint
 abstract: Linter, validator and converter for CodeMeta (codemeta.json), Citation File Format (CITATION.cff) and schema.org software metadata, supporting all released schema versions.
 authors:
-  - given-names: Christoph
+  - given-names: Christian
     family-names: Mahnke
+    orcid: "https://orcid.org/0009-0003-1361-4159"
 version: 0.1.0
 date-released: "2026-10-13"
 license: MIT

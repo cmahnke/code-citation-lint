@@ -141,3 +141,23 @@ interface RuleConfig {
 ```
 
 Resolution order: exact rule id → `base/*` → bare base (`cff`) → `*`.
+
+## Rule catalog, ORCID and SPDX helpers
+
+```js
+import {RULE_CATALOG, getRuleInfo, ruleIds, orcidProblem, isSpdxId, spdxLicenseListVersion} from '@projektemacher/code-citation-lint'
+
+RULE_CATALOG  // [{rule: 'cff/parse', group: 'cff', severity: 'error', description: '…'}, …]
+getRuleInfo('codemeta/orcid-format') // the catalog entry, or undefined
+ruleIds()                            // all rule ids
+
+// ORCID validation (format + ISO 7064 MOD 11-2 check digit); only inspects
+// orcid.org URLs, returns 'format' | 'check-digit' | undefined
+orcidProblem('https://orcid.org/0000-0002-1825-0097') // undefined
+
+// SPDX license list (vendored from https://spdx.org/licenses/, see schemas/sources.json)
+isSpdxId('MIT')               // true
+spdxLicenseListVersion()      // e.g. '3.29.0'
+```
+
+The full catalog is documented in [rules.md](rules.md).
