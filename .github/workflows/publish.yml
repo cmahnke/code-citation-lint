@@ -3,6 +3,10 @@ name: Publish
 on:
   release:
     types: [published]
+  # Manual re-runs without a new version (e.g. retrying a failed registry
+  # after fixing the workflow): reads the version from package.json, so the
+  # npm guard skips already-published versions automatically.
+  workflow_dispatch:
 
 jobs:
   validate:
@@ -21,14 +25,15 @@ jobs:
       - run: npm run test
       - run: npm run self-lint
 
-  # Registry deployment only starts after the full validation job passed
-  publish:
-    name: Publish to npm and GitHub Packages
+  # Registry deployments only start after the full validation job passed.
+  # The two publish jobs are independent of each other: a failure in one
+  # registry never blocks the other.
+  publish-npm:
+    name: Publish to npm
     needs: validate
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
       id-token: write
     steps:
       - uses: actions/checkout@v7
@@ -72,17 +77,40 @@ jobs:
         if: steps.guard-npm.outputs.exists == 'true'
         run: echo "Version ${VERSION} already exists on the npm registry — skipping publish (pass)."
 
+  publish-github-packages:
+    name: Publish to GitHub Packages
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
       # GitHub Packages requires the npm scope to match the repository owner.
       # This repository lives under github.com/cmahnke, so the package is
       # republished there as @cmahnke/code-citation-lint (the npm package is
       # @projektemacher/code-citation-lint). If the repository moves to a
-      # projektemacher GitHub organization, adjust GH_SCOPE accordingly.
+      # projektemacher GitHub organization, adjust the scope below accordingly.
+      # NOTE: auth must be configured through setup-node (registry-url +
+      # scope): it writes to $RUNNER_TEMP/.npmrc and points npm at it via
+      # NPM_CONFIG_USERCONFIG, while a hand-written ~/.npmrc is ignored.
+      - name: Configure GitHub Packages registry
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: '@cmahnke'
       - name: Publish to GitHub Packages
         env:
-          GH_SCOPE: cmahnke
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm pkg set name="@${GH_SCOPE}/code-citation-lint"
-          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          echo "@${GH_SCOPE}:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          npm pkg set name="@cmahnke/code-citation-lint"
           npm publish
