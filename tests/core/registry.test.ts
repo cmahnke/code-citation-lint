@@ -1,6 +1,13 @@
 import {describe, expect, it} from 'vitest'
 import {crossCheck} from '../../src/crosscheck.js'
-import {registerVersion, getSchema, getVersions, isVersionRegistered, normalizeVersion, applyRuleConfig} from '../../src/registry.js'
+import {
+  registerVersion,
+  getSchema,
+  getVersions,
+  isVersionRegistered,
+  normalizeVersion,
+  applyRuleConfig
+} from '../../src/registry.js'
 import {lintObject} from '../../src/lint.js'
 import type {LintFinding, LintOptions} from '../../src/types.js'
 
@@ -35,7 +42,7 @@ describe('crossCheck', () => {
       'repository-code': 'https://github.com/org/beta'
     }
     const findings = crossCheck(codemeta, cff)
-    expect(findings.map(finding => finding.rule)).toEqual([
+    expect(findings.map((finding) => finding.rule)).toEqual([
       'crosscheck/name-mismatch',
       'crosscheck/version-mismatch',
       'crosscheck/license-mismatch',
@@ -45,7 +52,10 @@ describe('crossCheck', () => {
   })
 
   it('normalizes SPDX license URLs and .git repository suffixes', () => {
-    const codemeta = {license: 'https://spdx.org/licenses/MIT', codeRepository: 'https://github.com/org/tool'}
+    const codemeta = {
+      license: 'https://spdx.org/licenses/MIT',
+      codeRepository: 'https://github.com/org/tool'
+    }
     const cff = {license: 'MIT', 'repository-code': 'https://github.com/org/tool.git'}
     expect(crossCheck(codemeta, cff)).toEqual([])
   })
@@ -68,7 +78,7 @@ describe('registry', () => {
     })
     expect(isVersionRegistered('codemeta', '9.9-test')).toBe(true)
     expect(getSchema('codemeta', '9.9-test')).toBeDefined()
-    expect(getVersions('codemeta').map(info => info.version)).toContain('9.9-test')
+    expect(getVersions('codemeta').map((info) => info.version)).toContain('9.9-test')
 
     const result = lintObject({name: 'custom'}, {version: '9.9-test'})
     expect(result.version).toBe('9.9-test')
@@ -85,7 +95,9 @@ describe('registry', () => {
 
   it('applies rule config with severity overrides', () => {
     const finding: LintFinding = {severity: 'warning', rule: 'cff/missing-license', message: 'x'}
-    expect(applyRuleConfig(finding, {severities: {'cff/missing-license': 'error'}})?.severity).toBe('error')
+    expect(applyRuleConfig(finding, {severities: {'cff/missing-license': 'error'}})?.severity).toBe(
+      'error'
+    )
     expect(applyRuleConfig(finding, {disable: ['cff/missing-license']})).toBeNull()
     expect(applyRuleConfig(finding, {severities: {cff: 'info'}})?.severity).toBe('info')
     expect(applyRuleConfig(finding, {severities: {'*': 'error'}})?.severity).toBe('error')

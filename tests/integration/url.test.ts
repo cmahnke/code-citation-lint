@@ -30,13 +30,15 @@ beforeAll(async () => {
     response.writeHead(404)
     response.end()
   })
-  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve))
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
   const address = server.address()
   baseUrl = `http://127.0.0.1:${typeof address === 'object' && address !== null ? address.port : 0}`
 })
 
 afterAll(async () => {
-  await new Promise<void>((resolve, reject) => server.close(error => (error ? reject(error) : resolve())))
+  await new Promise<void>((resolve, reject) =>
+    server.close((error) => (error ? reject(error) : resolve()))
+  )
 })
 
 describe('lintUrl', () => {
@@ -51,12 +53,12 @@ describe('lintUrl', () => {
   it('reports fetch failures', async () => {
     const results = await lintUrl(`${baseUrl}/missing.json`)
     expect(results[0]?.valid).toBe(false)
-    expect(results[0]?.errors.some(error => error.rule === 'fetch/failed')).toBe(true)
+    expect(results[0]?.errors.some((error) => error.rule === 'fetch/failed')).toBe(true)
   })
 
   it('reports parse failures for malformed content', async () => {
     const results = await lintUrl(`${baseUrl}/broken.json`)
     expect(results[0]?.valid).toBe(false)
-    expect(results[0]?.errors.some(error => error.rule === 'lint/parse')).toBe(true)
+    expect(results[0]?.errors.some((error) => error.rule === 'lint/parse')).toBe(true)
   })
 })

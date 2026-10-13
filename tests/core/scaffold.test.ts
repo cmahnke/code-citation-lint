@@ -5,7 +5,9 @@ import {lintCodeMetaObject} from '../../src/codemeta/lint.js'
 
 describe('parseAuthor', () => {
   it('parses npm author strings and objects', () => {
-    expect(parseAuthor('Christian Mahnke <christoph@example.org> (https://example.org/~cm)')).toEqual({
+    expect(
+      parseAuthor('Christian Mahnke <christoph@example.org> (https://example.org/~cm)')
+    ).toEqual({
       name: 'Christian Mahnke',
       email: 'christoph@example.org',
       url: 'https://example.org/~cm'

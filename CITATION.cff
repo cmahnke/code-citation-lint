@@ -6,7 +6,7 @@ authors:
   - given-names: Christian
     family-names: Mahnke
     orcid: "https://orcid.org/0009-0003-1361-4159"
-version: 0.1.0
+version: 0.1.1
 date-released: "2026-10-13"
 license: MIT
 repository-code: "https://github.com/cmahnke/code-citation-lint"

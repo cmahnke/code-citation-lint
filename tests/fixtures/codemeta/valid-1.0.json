@@ -14,8 +14,5 @@
   "codeRepository": "https://github.com/synthetic/example",
   "version": "1.0.0",
   "datePublished": "2021-01-01",
-  "tags": [
-    "synthetic",
-    "test"
-  ]
+  "tags": ["synthetic", "test"]
 }

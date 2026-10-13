@@ -7,13 +7,29 @@ afterEach(() => {
 
 describe('parseGitHubRepo', () => {
   it('parses plain repository URLs', () => {
-    expect(parseGitHubRepo('https://github.com/owner/repo')).toEqual({owner: 'owner', repo: 'repo', branch: undefined})
-    expect(parseGitHubRepo('http://github.com/owner/repo/')).toEqual({owner: 'owner', repo: 'repo', branch: undefined})
+    expect(parseGitHubRepo('https://github.com/owner/repo')).toEqual({
+      owner: 'owner',
+      repo: 'repo',
+      branch: undefined
+    })
+    expect(parseGitHubRepo('http://github.com/owner/repo/')).toEqual({
+      owner: 'owner',
+      repo: 'repo',
+      branch: undefined
+    })
   })
 
   it('parses tree URLs and strips .git suffixes', () => {
-    expect(parseGitHubRepo('https://github.com/owner/repo/tree/develop')).toEqual({owner: 'owner', repo: 'repo', branch: 'develop'})
-    expect(parseGitHubRepo('https://github.com/owner/repo.git')).toEqual({owner: 'owner', repo: 'repo', branch: undefined})
+    expect(parseGitHubRepo('https://github.com/owner/repo/tree/develop')).toEqual({
+      owner: 'owner',
+      repo: 'repo',
+      branch: 'develop'
+    })
+    expect(parseGitHubRepo('https://github.com/owner/repo.git')).toEqual({
+      owner: 'owner',
+      repo: 'repo',
+      branch: undefined
+    })
   })
 
   it('rejects non-repository URLs', () => {
@@ -31,10 +47,12 @@ describe('normalizeFileUrl', () => {
   })
 
   it('keeps other URLs as-is', () => {
-    expect(normalizeFileUrl('https://raw.githubusercontent.com/owner/repo/main/codemeta.json')).toBe(
-      'https://raw.githubusercontent.com/owner/repo/main/codemeta.json'
+    expect(
+      normalizeFileUrl('https://raw.githubusercontent.com/owner/repo/main/codemeta.json')
+    ).toBe('https://raw.githubusercontent.com/owner/repo/main/codemeta.json')
+    expect(normalizeFileUrl('https://example.com/codemeta.json')).toBe(
+      'https://example.com/codemeta.json'
     )
-    expect(normalizeFileUrl('https://example.com/codemeta.json')).toBe('https://example.com/codemeta.json')
   })
 })
 
@@ -45,7 +63,11 @@ describe('resolveBranches', () => {
       json: async () => ({default_branch: 'develop'})
     }))
     vi.stubGlobal('fetch', fetchMock)
-    expect(await resolveBranches({owner: 'owner', repo: 'repo'})).toEqual(['develop', 'main', 'master'])
+    expect(await resolveBranches({owner: 'owner', repo: 'repo'})).toEqual([
+      'develop',
+      'main',
+      'master'
+    ])
     expect(fetchMock).toHaveBeenCalledWith('https://api.github.com/repos/owner/repo')
   })
 
@@ -98,11 +120,15 @@ describe('lintUrl repository expansion', () => {
   }
 
   it('fetches CITATION.cff from the default branch', async () => {
-    const cff = 'cff-version: 1.2.0\nmessage: cite me\ntitle: Demo\nauthors:\n  - given-names: A\n    family-names: B\n'
+    const cff =
+      'cff-version: 1.2.0\nmessage: cite me\ntitle: Demo\nauthors:\n  - given-names: A\n    family-names: B\n'
     vi.stubGlobal(
       'fetch',
       routeFetch({
-        'https://api.github.com/repos/owner/repo': {status: 200, body: JSON.stringify({default_branch: 'main'})},
+        'https://api.github.com/repos/owner/repo': {
+          status: 200,
+          body: JSON.stringify({default_branch: 'main'})
+        },
         'https://raw.githubusercontent.com/owner/repo/main/codemeta.json': {status: 404},
         'https://raw.githubusercontent.com/owner/repo/main/CITATION.cff': {status: 200, body: cff}
       })
@@ -114,7 +140,8 @@ describe('lintUrl repository expansion', () => {
   })
 
   it('falls back to master when a branch has no metadata', async () => {
-    const cff = 'cff-version: 1.2.0\nmessage: cite me\ntitle: Demo\nauthors:\n  - given-names: A\n    family-names: B\n'
+    const cff =
+      'cff-version: 1.2.0\nmessage: cite me\ntitle: Demo\nauthors:\n  - given-names: A\n    family-names: B\n'
     vi.stubGlobal(
       'fetch',
       routeFetch({
@@ -137,7 +164,7 @@ describe('lintUrl repository expansion', () => {
     )
     const results = await lintUrl('https://github.com/owner/repo')
     expect(results).toHaveLength(1)
-    expect(results[0]?.errors.some(error => error.rule === 'fetch/failed')).toBe(true)
+    expect(results[0]?.errors.some((error) => error.rule === 'fetch/failed')).toBe(true)
   })
 
   it('fetches plain URLs and lints the content', async () => {

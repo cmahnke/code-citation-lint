@@ -1,5 +1,11 @@
 import type {Format} from './types.js'
-import {CODEMETA_VERSIONS, getLatestVersion, getVersions, isVersionRegistered, normalizeVersion} from './registry.js'
+import {
+  CODEMETA_VERSIONS,
+  getLatestVersion,
+  getVersions,
+  isVersionRegistered,
+  normalizeVersion
+} from './registry.js'
 
 /**
  * Extracts a CodeMeta version from a context URL, e.g.
@@ -15,7 +21,9 @@ export function versionFromContextUrl(url: string): string | undefined {
 
 /** Unversioned context URLs that resolve to the latest released context. */
 export function isUnversionedContextUrl(url: string): boolean {
-  return /w3id\.org\/codemeta\/?$/i.test(url) || /codemeta\/(master|main)\/codemeta\.jsonld/i.test(url)
+  return (
+    /w3id\.org\/codemeta\/?$/i.test(url) || /codemeta\/(master|main)\/codemeta\.jsonld/i.test(url)
+  )
 }
 
 /** Context URLs pointing at schema.org itself (any version, any scheme). */
@@ -102,12 +110,20 @@ export function detectSchemaOrg(record: Record<string, unknown>): 'schemaorg' | 
 }
 
 function looksLikeCodemeta(record: Record<string, unknown>): boolean {
-  const terms = ['name', 'description', 'author', 'license', 'codeRepository', 'softwareVersion', 'identifier']
-  return Object.keys(record).some(key => terms.includes(key))
+  const terms = [
+    'name',
+    'description',
+    'author',
+    'license',
+    'codeRepository',
+    'softwareVersion',
+    'identifier'
+  ]
+  return Object.keys(record).some((key) => terms.includes(key))
 }
 
 function sniffVersionFromTerms(record: Record<string, unknown>): string | undefined {
-  const ordering = CODEMETA_VERSIONS.map(info => info.version)
+  const ordering = CODEMETA_VERSIONS.map((info) => info.version)
   let best: {version: string; index: number} | undefined
   for (const {term, version} of VERSION_SPECIFIC_TERMS) {
     const index = ordering.indexOf(version)
@@ -119,7 +135,11 @@ function sniffVersionFromTerms(record: Record<string, unknown>): string | undefi
 }
 
 /** Detects the codemeta version from `@context` (string or array). */
-export function detectCodemetaVersion(record: Record<string, unknown>): {version?: string; versionSource: 'detected' | 'unknown'; detail?: string} {
+export function detectCodemetaVersion(record: Record<string, unknown>): {
+  version?: string
+  versionSource: 'detected' | 'unknown'
+  detail?: string
+} {
   const context = record['@context']
   if (context === undefined) {
     return {versionSource: 'unknown', detail: 'No @context found.'}
@@ -153,7 +173,8 @@ export function detectCodemetaVersion(record: Record<string, unknown>): {version
     return {
       version: getLatestVersion('codemeta'),
       versionSource: 'detected',
-      detail: 'Unversioned context; resolved to the latest release. Consider pinning the context version.'
+      detail:
+        'Unversioned context; resolved to the latest release. Consider pinning the context version.'
     }
   }
   return {versionSource: 'unknown', detail: `Unrecognized @context: ${candidates.join(', ')}`}

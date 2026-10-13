@@ -19,6 +19,13 @@
     "noEmit": true,
     "ignoreDeprecations": "6.0"
   },
-  "include": ["src/**/*", "scripts/**/*", "tests/**/*", "eslint.config.js", "tsup.config.ts", "vitest.config.ts"],
+  "include": [
+    "src/**/*",
+    "scripts/**/*",
+    "tests/**/*",
+    "eslint.config.js",
+    "tsup.config.ts",
+    "vitest.config.ts"
+  ],
   "exclude": ["node_modules", "dist", "dist-browser", "site", "coverage"]
 }

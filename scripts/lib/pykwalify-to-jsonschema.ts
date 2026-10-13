@@ -68,7 +68,7 @@ function convertNode(node: PyKNode): JsonSchemaNode {
       }
       return {
         type: 'array',
-        items: {anyOf: entries.map(entry => convertNode(entry))}
+        items: {anyOf: entries.map((entry) => convertNode(entry))}
       }
     }
     case 'str': {

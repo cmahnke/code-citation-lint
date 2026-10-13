@@ -40,7 +40,14 @@ export {
 export type {DetectionOutcome} from './detect.js'
 
 // Conversions (CFF -> codemeta / schema.org / zenodo, codemeta -> CFF)
-export {cffToCodemeta, cffToSchemaOrg, cffToZenodo, codemetaToCff, convertContent, convertDocument} from './convert.js'
+export {
+  cffToCodemeta,
+  cffToSchemaOrg,
+  cffToZenodo,
+  codemetaToCff,
+  convertContent,
+  convertDocument
+} from './convert.js'
 export type {ConvertOptions, ConvertOutcome, ConvertTarget} from './convert.js'
 
 // Scaffolding (init)
@@ -57,7 +64,14 @@ export type {
 } from './types.js'
 
 // I/O
-export {lintUrl, normalizeFileUrl, classifyByName, CODEMETA_FILE, CITATION_FILE, parseGitHubRepo} from './io.js'
+export {
+  lintUrl,
+  normalizeFileUrl,
+  classifyByName,
+  CODEMETA_FILE,
+  CITATION_FILE,
+  parseGitHubRepo
+} from './io.js'
 
 // Node-only (filesystem)
 export {discover, lintFile, lintDirectory, lintDiscovered, lintTarget} from './fs-io.js'

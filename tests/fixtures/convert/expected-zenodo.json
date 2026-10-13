@@ -14,10 +14,7 @@
     }
   ],
   "description": "A synthetic CITATION.cff used to test the conversion output.",
-  "keywords": [
-    "conversion",
-    "test"
-  ],
+  "keywords": ["conversion", "test"],
   "license": {
     "id": "MIT"
   },

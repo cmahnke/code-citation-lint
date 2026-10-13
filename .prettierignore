@@ -1,0 +1,9 @@
+dist
+dist-browser
+site
+coverage
+docs/api
+schemas
+tests/fixtures
+*.cff
+package-lock.json

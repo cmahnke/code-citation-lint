@@ -15,9 +15,6 @@
   "codeRepository": "https://github.com/synthetic/example",
   "softwareVersion": "1.0.0",
   "datePublished": "2021-01-01",
-  "keywords": [
-    "synthetic",
-    "test"
-  ],
+  "keywords": ["synthetic", "test"],
   "contIntegration": "https://example.com/ci"
 }

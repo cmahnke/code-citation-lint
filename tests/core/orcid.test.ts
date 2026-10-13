@@ -44,12 +44,14 @@ describe('orcid lint rules', () => {
 
   it('passes valid ORCIDs in codemeta documents', () => {
     const result = lintCodeMetaContent(codemetaWith('https://orcid.org/0000-0002-1825-0097'))
-    expect(result.warnings.filter(warning => warning.rule === 'codemeta/orcid-format')).toEqual([])
+    expect(result.warnings.filter((warning) => warning.rule === 'codemeta/orcid-format')).toEqual(
+      []
+    )
   })
 
   it('flags wrong check digits in codemeta documents', () => {
     const result = lintCodeMetaContent(codemetaWith('https://orcid.org/0000-0002-1825-0098'))
-    const findings = result.warnings.filter(warning => warning.rule === 'codemeta/orcid-format')
+    const findings = result.warnings.filter((warning) => warning.rule === 'codemeta/orcid-format')
     expect(findings).toHaveLength(1)
     expect(findings[0]?.message).toContain('check digit')
   })
@@ -63,7 +65,7 @@ describe('orcid lint rules', () => {
         author: [{'@type': 'Person', '@id': 'https://orcid.org/0000-0000-0000-0000'}]
       })
     )
-    const findings = result.warnings.filter(warning => warning.rule === 'schemaorg/orcid-format')
+    const findings = result.warnings.filter((warning) => warning.rule === 'schemaorg/orcid-format')
     expect(findings).toHaveLength(1)
     expect(findings[0]?.message).toContain('check digit')
   })

@@ -15,7 +15,9 @@ function normalizeLicense(value: unknown): string {
 }
 
 function repoUrl(value: unknown): string {
-  return normalizeText(value).replace(/\.git$/, '').replace(/^git@github\.com:/, 'https://github.com/')
+  return normalizeText(value)
+    .replace(/\.git$/, '')
+    .replace(/^git@github\.com:/, 'https://github.com/')
 }
 
 interface Comparison {
@@ -57,7 +59,12 @@ const CFF_KEYS: Record<string, string> = {
 
 /** Compares a codemeta.json and a CITATION.cff object for consistency. */
 export function crossCheck(codemetaDoc: unknown, cffDoc: unknown): LintFinding[] {
-  if (codemetaDoc === null || cffDoc === null || typeof codemetaDoc !== 'object' || typeof cffDoc !== 'object') {
+  if (
+    codemetaDoc === null ||
+    cffDoc === null ||
+    typeof codemetaDoc !== 'object' ||
+    typeof cffDoc !== 'object'
+  ) {
     return []
   }
   const cm = codemetaDoc as Record<string, unknown>

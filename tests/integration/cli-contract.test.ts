@@ -9,8 +9,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const fixtures = path.resolve(root, 'tests/fixtures')
 const cli = path.join(root, 'dist/cli.js')
 
-function run(args: string[], options: {input?: string; allowFailure?: boolean} = {}): {stdout: string; stderr: string; status: number} {
-  const result = spawnSync('node', [cli, ...args], {cwd: root, input: options.input, encoding: 'utf8'})
+function run(
+  args: string[],
+  options: {input?: string; allowFailure?: boolean} = {}
+): {stdout: string; stderr: string; status: number} {
+  const result = spawnSync('node', [cli, ...args], {
+    cwd: root,
+    input: options.input,
+    encoding: 'utf8'
+  })
   const status = result.status ?? 1
   if (status !== 0 && !options.allowFailure) {
     throw new Error(`CLI exited with ${status}: ${result.stderr}`)
@@ -43,7 +50,9 @@ describe('lint CLI contract', () => {
   })
 
   it('rejects invalid --format values with exit 2', () => {
-    const {status, stderr} = run(['-f', 'yaml', path.join(fixtures, 'cff/valid-1.2.0.cff')], {allowFailure: true})
+    const {status, stderr} = run(['-f', 'yaml', path.join(fixtures, 'cff/valid-1.2.0.cff')], {
+      allowFailure: true
+    })
     expect(status).toBe(2)
     expect(stderr).toContain('Invalid format')
   })
@@ -64,10 +73,14 @@ describe('lint CLI contract', () => {
       expect(text.stdout).toContain('discovery/suggest-recursive')
       const json = run(['-f', 'json', dir], {allowFailure: true})
       expect(json.status).toBe(2)
-      const parsed = JSON.parse(json.stdout) as {valid: boolean; warnings: {rule: string}[]; infos: {rule: string}[]}[]
+      const parsed = JSON.parse(json.stdout) as {
+        valid: boolean
+        warnings: {rule: string}[]
+        infos: {rule: string}[]
+      }[]
       expect(parsed).toHaveLength(1)
       expect(parsed[0]?.valid).toBe(true)
-      expect(parsed[0]?.warnings.some(w => w.rule === 'discovery/none-found')).toBe(true)
+      expect(parsed[0]?.warnings.some((w) => w.rule === 'discovery/none-found')).toBe(true)
     } finally {
       rmSync(dir, {recursive: true, force: true})
     }
@@ -129,7 +142,9 @@ describe('convert stdout purity and output paths', () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), 'ccl-convert-'))
     try {
       const output = path.join(dir, 'typo-output.json')
-      const {status, stderr} = run(['convert', '--to', 'codemeta,schemaorg', source, output], {allowFailure: true})
+      const {status, stderr} = run(['convert', '--to', 'codemeta,schemaorg', source, output], {
+        allowFailure: true
+      })
       expect(status).toBe(2)
       expect(stderr).toContain('requires a directory')
       expect(existsSync(output)).toBe(false)
@@ -155,7 +170,9 @@ describe('convert stdout purity and output paths', () => {
     try {
       const file = path.join(dir, 'existing.json')
       writeFileSync(file, '{}\n', 'utf8')
-      const {status, stderr} = run(['convert', '--to', 'codemeta,schemaorg', source, file], {allowFailure: true})
+      const {status, stderr} = run(['convert', '--to', 'codemeta,schemaorg', source, file], {
+        allowFailure: true
+      })
       expect(status).toBe(2)
       expect(stderr).toContain('requires the output to be a directory')
     } finally {

@@ -26,10 +26,10 @@ Lints a JSON or YAML string; type and version are autodetected unless overridden
 import {lintContent} from '@projektemacher/code-citation-lint'
 
 const result = lintContent(yamlOrJsonString, {
-  type: 'codemeta',      // 'codemeta' | 'cff' | 'schemaorg' | undefined (autodetect)
-  version: '3.0',        // force a schema version (autodetect when omitted; normalized, e.g. 'v3.0' works)
+  type: 'codemeta', // 'codemeta' | 'cff' | 'schemaorg' | undefined (autodetect)
+  version: '3.0', // force a schema version (autodetect when omitted; normalized, e.g. 'v3.0' works)
   rules: {disable: ['codemeta/missing-repository']},
-  file: 'codemeta.json'  // attached to the result
+  file: 'codemeta.json' // attached to the result
 })
 ```
 
@@ -56,11 +56,18 @@ Compares two parsed documents for consistency (name/title, version, license, rep
 ## Conversions
 
 ```js
-import {cffToCodemeta, cffToSchemaOrg, cffToZenodo, codemetaToCff, convertDocument, convertContent} from '@projektemacher/code-citation-lint'
+import {
+  cffToCodemeta,
+  cffToSchemaOrg,
+  cffToZenodo,
+  codemetaToCff,
+  convertDocument,
+  convertContent
+} from '@projektemacher/code-citation-lint'
 
 cffToCodemeta(cffObject, {codemetaVersion: '4.0'}) // @context: https://w3id.org/codemeta/4.0
-cffToSchemaOrg(cffObject)                          // @context: https://schema.org
-cffToZenodo(cffObject)                             // .zenodo.json content (cffconvert parity)
+cffToSchemaOrg(cffObject) // @context: https://schema.org
+cffToZenodo(cffObject) // .zenodo.json content (cffconvert parity)
 codemetaToCff(codemetaObject, {cffVersion: '1.2.0'}) // reverse conversion
 
 // With parsing and linting (default: lint enabled):
@@ -84,21 +91,21 @@ const minimal = minimalScaffold() // placeholder templates with TODO markers
 
 ```ts
 interface LintResult {
-  file?: string            // file name/source, when known
+  file?: string // file name/source, when known
   type: 'codemeta' | 'cff' | 'schemaorg'
-  version?: string         // schema version used
+  version?: string // schema version used
   versionSource: 'detected' | 'specified' | 'unknown'
-  valid: boolean           // no error-level findings
-  errors: LintFinding[]    // schema violations etc.
-  warnings: LintFinding[]  // recommended fields, formats, crosschecks
-  infos: LintFinding[]     // suggestions
+  valid: boolean // no error-level findings
+  errors: LintFinding[] // schema violations etc.
+  warnings: LintFinding[] // recommended fields, formats, crosschecks
+  infos: LintFinding[] // suggestions
 }
 
 interface LintFinding {
   severity: 'error' | 'warning' | 'info'
-  rule: string             // 'schema', 'cff/missing-license', 'crosscheck/name-mismatch', …
+  rule: string // 'schema', 'cff/missing-license', 'crosscheck/name-mismatch', …
   message: string
-  path?: string            // JSON-pointer-ish location in the document
+  path?: string // JSON-pointer-ish location in the document
 }
 ```
 
@@ -119,9 +126,21 @@ Fetches and lints a URL. GitHub `blob` URLs are rewritten to raw URLs; repositor
 ## Version registry
 
 ```js
-import {CFF_VERSIONS, CODEMETA_VERSIONS, SCHEMAORG_VERSIONS, getVersions, getSchema, getLatestVersion, registerVersion, isVersionRegistered, normalizeVersion, applyRuleConfig, codemetaContextUrl} from '@projektemacher/code-citation-lint'
+import {
+  CFF_VERSIONS,
+  CODEMETA_VERSIONS,
+  SCHEMAORG_VERSIONS,
+  getVersions,
+  getSchema,
+  getLatestVersion,
+  registerVersion,
+  isVersionRegistered,
+  normalizeVersion,
+  applyRuleConfig,
+  codemetaContextUrl
+} from '@projektemacher/code-citation-lint'
 
-getVersions('cff')          // [{version: '1.0.3', status: 'released'}, …]
+getVersions('cff') // [{version: '1.0.3', status: 'released'}, …]
 getSchema('codemeta', '3.0') // the bundled/generated JSON Schema object
 getLatestVersion('codemeta') // '4.0'
 
@@ -135,8 +154,8 @@ Detection helpers (`detectTypeAndVersion`, `detectCodemetaVersion`, `detectSchem
 
 ```ts
 interface RuleConfig {
-  disable?: string[]                                // rule ids or prefixes ('crosscheck/*')
-  severities?: Record<string, Severity | 'off'>     // exact id, 'base/*', 'base' or '*'
+  disable?: string[] // rule ids or prefixes ('crosscheck/*')
+  severities?: Record<string, Severity | 'off'> // exact id, 'base/*', 'base' or '*'
 }
 ```
 
@@ -145,19 +164,26 @@ Resolution order: exact rule id → `base/*` → bare base (`cff`) → `*`.
 ## Rule catalog, ORCID and SPDX helpers
 
 ```js
-import {RULE_CATALOG, getRuleInfo, ruleIds, orcidProblem, isSpdxId, spdxLicenseListVersion} from '@projektemacher/code-citation-lint'
+import {
+  RULE_CATALOG,
+  getRuleInfo,
+  ruleIds,
+  orcidProblem,
+  isSpdxId,
+  spdxLicenseListVersion
+} from '@projektemacher/code-citation-lint'
 
-RULE_CATALOG  // [{rule: 'cff/parse', group: 'cff', severity: 'error', description: '…'}, …]
+RULE_CATALOG // [{rule: 'cff/parse', group: 'cff', severity: 'error', description: '…'}, …]
 getRuleInfo('codemeta/orcid-format') // the catalog entry, or undefined
-ruleIds()                            // all rule ids
+ruleIds() // all rule ids
 
 // ORCID validation (format + ISO 7064 MOD 11-2 check digit); only inspects
 // orcid.org URLs, returns 'format' | 'check-digit' | undefined
 orcidProblem('https://orcid.org/0000-0002-1825-0097') // undefined
 
 // SPDX license list (vendored from https://spdx.org/licenses/, see schemas/sources.json)
-isSpdxId('MIT')               // true
-spdxLicenseListVersion()      // e.g. '3.29.0'
+isSpdxId('MIT') // true
+spdxLicenseListVersion() // e.g. '3.29.0'
 ```
 
 The full catalog is documented in [rules.md](rules.md).

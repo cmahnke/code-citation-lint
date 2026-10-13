@@ -25,27 +25,47 @@ function runCffRules(document: Record<string, unknown>, schema: object): LintFin
   const has = (key: string): boolean => document[key] !== undefined && document[key] !== null
 
   if (!has('license')) {
-    findings.push(finding('warning', 'cff/missing-license', `No license specified. ${LICENSE_HINT}`))
+    findings.push(
+      finding('warning', 'cff/missing-license', `No license specified. ${LICENSE_HINT}`)
+    )
   }
   if (!has('repository-code')) {
     findings.push(
-      finding('info', 'cff/missing-repository-code', 'No repository-code specified. Pointing to the source code repository helps others find your work.')
+      finding(
+        'info',
+        'cff/missing-repository-code',
+        'No repository-code specified. Pointing to the source code repository helps others find your work.'
+      )
     )
   }
   if (has('version') !== has('date-released')) {
     findings.push(
-      finding('info', 'cff/version-date-consistency', 'Only one of "version" and "date-released" is present. Providing both makes the citation more precise.')
+      finding(
+        'info',
+        'cff/version-date-consistency',
+        'Only one of "version" and "date-released" is present. Providing both makes the citation more precise.'
+      )
     )
   }
 
   // Lenient converted schemas (CFF 1.0.x/1.1.0) allow additional properties;
   // surface unknown keys as warnings there.
-  const rootSchema = schema as {additionalProperties?: boolean; properties?: Record<string, unknown>}
+  const rootSchema = schema as {
+    additionalProperties?: boolean
+    properties?: Record<string, unknown>
+  }
   if (rootSchema.additionalProperties === true) {
     const known = new Set(Object.keys(rootSchema.properties ?? {}))
     for (const key of Object.keys(document)) {
       if (!known.has(key)) {
-        findings.push(finding('warning', 'cff/unknown-key', `"${key}" is not a valid key for this CFF version.`, `/${key}`))
+        findings.push(
+          finding(
+            'warning',
+            'cff/unknown-key',
+            `"${key}" is not a valid key for this CFF version.`,
+            `/${key}`
+          )
+        )
       }
     }
   }
@@ -105,24 +125,48 @@ export function lintCffObject(document: unknown, options: LintOptions = {}): Lin
   const record = document as Record<string, unknown>
 
   // Version handling
-  const detected = typeof record['cff-version'] === 'string' ? normalizeVersion(record['cff-version']) : undefined
-  const normalizedOption = options.version !== undefined ? normalizeVersion(options.version) : undefined
+  const detected =
+    typeof record['cff-version'] === 'string' ? normalizeVersion(record['cff-version']) : undefined
+  const normalizedOption =
+    options.version !== undefined ? normalizeVersion(options.version) : undefined
   let version = normalizedOption ?? detected
-  let versionSource: LintResult['versionSource'] = options.version ? 'specified' : detected ? 'detected' : 'unknown'
+  let versionSource: LintResult['versionSource'] = options.version
+    ? 'specified'
+    : detected
+      ? 'detected'
+      : 'unknown'
   if (detected && normalizedOption && normalizedOption !== detected) {
     addFinding(
       result,
-      finding('warning', 'cff/version-mismatch', `Document declares cff-version ${detected}, validating against ${normalizedOption}.`)
+      finding(
+        'warning',
+        'cff/version-mismatch',
+        `Document declares cff-version ${detected}, validating against ${normalizedOption}.`
+      )
     )
   }
   if (!detected && !options.version) {
-    addFinding(result, finding('error', 'cff/no-version', 'No cff-version found. A CITATION.cff must declare its CFF version.'))
+    addFinding(
+      result,
+      finding(
+        'error',
+        'cff/no-version',
+        'No cff-version found. A CITATION.cff must declare its CFF version.'
+      )
+    )
   }
   if (version && !getSchema('cff', version)) {
     const available = getVersions('cff')
-      .map(info => info.version)
+      .map((info) => info.version)
       .join(', ')
-    addFinding(result, finding('error', 'cff/unsupported-version', `Unsupported cff-version ${version} (available: ${available}).`))
+    addFinding(
+      result,
+      finding(
+        'error',
+        'cff/unsupported-version',
+        `Unsupported cff-version ${version} (available: ${available}).`
+      )
+    )
     version = undefined
     versionSource = 'unknown'
   }

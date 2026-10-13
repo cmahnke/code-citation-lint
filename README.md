@@ -10,20 +10,20 @@ Linter, validator, scaffolder and converter for **CodeMeta** (`codemeta.json`), 
 - Usable as a **library** (Node.js & browser), via a **CLI**, and in a hosted **web demo**
 - Detects document type and schema version automatically, with manual overrides
 
-| | |
-|---|---|
-| npm | `npm install @projektemacher/code-citation-lint` |
-| CLI | `npx @projektemacher/code-citation-lint .` |
-| Docs | <https://cmahnke.github.io/code-citation-lint/> |
-| Demo | <https://cmahnke.github.io/code-citation-lint/> (page) |
+|        |                                                        |
+| ------ | ------------------------------------------------------ |
+| npm    | `npm install @projektemacher/code-citation-lint`       |
+| CLI    | `npx @projektemacher/code-citation-lint .`             |
+| Docs   | <https://cmahnke.github.io/code-citation-lint/>        |
+| Demo   | <https://cmahnke.github.io/code-citation-lint/> (page) |
 | Issues | <https://github.com/cmahnke/code-citation-lint/issues> |
 
 ## Supported versions
 
-| Format | Versions |
-|---|---|
-| CFF (CITATION.cff) | 1.0.3, 1.1.0, 1.2.0, 1.3.0 (draft) |
-| CodeMeta (codemeta.json) | 1.0, 2.0-rc, 2.0, 2.1, 3.0, 3.1, 4.0 |
+| Format                        | Versions                                                                           |
+| ----------------------------- | ---------------------------------------------------------------------------------- |
+| CFF (CITATION.cff)            | 1.0.3, 1.1.0, 1.2.0, 1.3.0 (draft)                                                 |
+| CodeMeta (codemeta.json)      | 1.0, 2.0-rc, 2.0, 2.1, 3.0, 3.1, 4.0                                               |
 | schema.org (software profile) | latest (curated Thing/CreativeWork/SoftwareSourceCode/SoftwareApplication profile) |
 
 See [docs/schemas.md](docs/schemas.md) for the schema sources and how they are generated.
@@ -34,7 +34,9 @@ See [docs/schemas.md](docs/schemas.md) for the schema sources and how they are g
 import {lintContent, lintTarget, getVersions} from '@projektemacher/code-citation-lint'
 
 // Lint a string (JSON or YAML), type + version autodetected
-const result = lintContent('cff-version: 1.2.0\nmessage: cite me\ntitle: Demo\nauthors:\n  - given-names: A\n    family-names: B\n')
+const result = lintContent(
+  'cff-version: 1.2.0\nmessage: cite me\ntitle: Demo\nauthors:\n  - given-names: A\n    family-names: B\n'
+)
 console.log(result.valid, result.version, result.warnings)
 
 // Lint a file, directory (auto-discovery) or URL
@@ -143,7 +145,9 @@ code-citation-lint --rules '{"disable": ["cff/missing-license"], "severities": {
 ```
 
 ```js
-lintContent(content, {rules: {disable: ['crosscheck/*'], severities: {'codemeta/missing-description': 'error'}}})
+lintContent(content, {
+  rules: {disable: ['crosscheck/*'], severities: {'codemeta/missing-description': 'error'}}
+})
 ```
 
 ## Web demo
@@ -159,7 +163,7 @@ npm run build:page   # demo page bundle -> dist-browser/demo.js (esbuild)
 npm run build:docs-site # render README + docs to HTML for the site
 npm run test         # vitest (unit + CLI integration, synthetic fixtures)
 npm run test:watch   # vitest in watch mode
-npm run lint         # eslint
+npm run lint         # prettier --check . + eslint
 npm run format       # prettier --write .
 npm run typecheck    # tsc --noEmit
 npm run self-lint    # lints this repo's own codemeta.json + CITATION.cff

@@ -33,7 +33,7 @@ function main(): void {
     ''
   ]
   for (const group of GROUP_ORDER) {
-    const entries = RULE_CATALOG.filter(info => info.group === group)
+    const entries = RULE_CATALOG.filter((info) => info.group === group)
     if (entries.length === 0) continue
     lines.push(`## ${GROUP_TITLES[group]}`, '', '| Rule | Default | Description |', '|---|---|---|')
     for (const info of entries) {
@@ -41,10 +41,7 @@ function main(): void {
     }
     lines.push('')
   }
-  lines.push(
-    `Total: ${RULE_CATALOG.length} rule ids.`,
-    ''
-  )
+  lines.push(`Total: ${RULE_CATALOG.length} rule ids.`, '')
   // The file is committed; regenerate after rule changes with `npm run docs:rules`.
   void writeFile(OUT, lines.join('\n'), 'utf8').then(() => {
     console.log(`OK docs/rules.md (${RULE_CATALOG.length} rules)`)

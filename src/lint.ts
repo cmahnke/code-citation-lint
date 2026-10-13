@@ -49,7 +49,14 @@ export function lintObject(document: unknown, options: LintOptions = {}): LintRe
     return lintCodeMetaObject(document, options)
   }
   const result = emptyResult('codemeta', options.file)
-  addFinding(result, finding('error', 'lint/undetected', detected?.detail ?? 'Could not detect the document type; specify --type.'))
+  addFinding(
+    result,
+    finding(
+      'error',
+      'lint/undetected',
+      detected?.detail ?? 'Could not detect the document type; specify --type.'
+    )
+  )
   return finalize(result, options)
 }
 
@@ -61,7 +68,10 @@ export function lintContent(content: string, options: LintOptions = {}): LintRes
   const parsed = parseDocument(content)
   if (parsed.document === undefined) {
     const result = emptyResult(options.type ?? 'codemeta', options.file)
-    addFinding(result, finding('error', 'lint/parse', parsed.error ?? 'Could not parse the document.'))
+    addFinding(
+      result,
+      finding('error', 'lint/parse', parsed.error ?? 'Could not parse the document.')
+    )
     return finalize(result, options)
   }
   if (options.type === 'codemeta') {

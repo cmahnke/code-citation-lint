@@ -34,7 +34,7 @@ describe('license-spdx list check', () => {
         license: 'MIT'
       })
     )
-    expect(result.infos.filter(info => info.rule === 'codemeta/license-spdx')).toEqual([])
+    expect(result.infos.filter((info) => info.rule === 'codemeta/license-spdx')).toEqual([])
   })
 
   it('flags well-formed but unknown SPDX ids in codemeta documents', () => {
@@ -47,7 +47,7 @@ describe('license-spdx list check', () => {
         license: 'MIT-XYZ'
       })
     )
-    const findings = result.infos.filter(info => info.rule === 'codemeta/license-spdx')
+    const findings = result.infos.filter((info) => info.rule === 'codemeta/license-spdx')
     expect(findings).toHaveLength(1)
     expect(findings[0]?.message).toContain('not in the SPDX license list')
   })
@@ -62,7 +62,7 @@ describe('license-spdx list check', () => {
         license: 'https://spdx.org/licenses/MIT'
       })
     )
-    expect(result.infos.filter(info => info.rule === 'codemeta/license-spdx')).toEqual([])
+    expect(result.infos.filter((info) => info.rule === 'codemeta/license-spdx')).toEqual([])
   })
 
   it('flags well-formed but unknown SPDX ids in schema.org documents', () => {
@@ -75,7 +75,7 @@ describe('license-spdx list check', () => {
         license: 'GPL-v3-not-real'
       })
     )
-    const findings = result.infos.filter(info => info.rule === 'schemaorg/license-spdx')
+    const findings = result.infos.filter((info) => info.rule === 'schemaorg/license-spdx')
     expect(findings).toHaveLength(1)
     expect(findings[0]?.message).toContain('not in the SPDX license list')
   })

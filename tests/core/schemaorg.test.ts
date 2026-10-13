@@ -30,8 +30,10 @@ describe('schema.org lint', () => {
     const content = readFileSync(path.join(fixtures, 'schemaorg/invalid.json'), 'utf8')
     const result = lintSchemaOrgContent(content)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(error => error.message.includes('thisIsNotASchemaOrgTerm'))).toBe(true)
-    expect(result.errors.some(error => error.path === '/datePublished')).toBe(true)
+    expect(result.errors.some((error) => error.message.includes('thisIsNotASchemaOrgTerm'))).toBe(
+      true
+    )
+    expect(result.errors.some((error) => error.path === '/datePublished')).toBe(true)
   })
 
   it('names the offending value and expected values in schema errors', () => {
@@ -39,11 +41,11 @@ describe('schema.org lint', () => {
       {'@context': 'https://schema.org', '@type': 'NotACodeType', datePublished: 42},
       {}
     )
-    const typeError = result.errors.find(error => error.path === '/@type')
+    const typeError = result.errors.find((error) => error.path === '/@type')
     expect(typeError?.message).toContain('must be one of:')
     expect(typeError?.message).toContain('SoftwareSourceCode')
     expect(typeError?.message).toContain('(got "NotACodeType")')
-    const dateError = result.errors.find(error => error.path === '/datePublished')
+    const dateError = result.errors.find((error) => error.path === '/datePublished')
     expect(dateError?.message).toContain('(got 42)')
   })
 
@@ -51,7 +53,7 @@ describe('schema.org lint', () => {
     const content = readFileSync(path.join(fixtures, 'schemaorg/warnings.json'), 'utf8')
     const result = lintSchemaOrgContent(content)
     expect(result.valid).toBe(true)
-    const rules = result.warnings.map(warning => warning.rule)
+    const rules = result.warnings.map((warning) => warning.rule)
     expect(rules).toContain('schemaorg/missing-description')
     expect(rules).toContain('schemaorg/missing-author')
   })
@@ -73,28 +75,39 @@ describe('schema.org lint', () => {
   })
 
   it('detects plain schema.org code documents', () => {
-    const outcome = detectTypeAndVersion({'@context': 'https://schema.org', '@type': 'SoftwareApplication', name: 'x'})
+    const outcome = detectTypeAndVersion({
+      '@context': 'https://schema.org',
+      '@type': 'SoftwareApplication',
+      name: 'x'
+    })
     expect(outcome.type).toBe('schemaorg')
     expect(outcome.version).toBe('latest')
     expect(outcome.versionSource).toBe('detected')
   })
 
   it('routes non-code schema.org documents to the profile and flags the @type', () => {
-    const result = lintContent(JSON.stringify({'@context': 'https://schema.org', '@type': 'Person', name: 'x'}))
+    const result = lintContent(
+      JSON.stringify({'@context': 'https://schema.org', '@type': 'Person', name: 'x'})
+    )
     expect(result.type).toBe('schemaorg')
     expect(result.valid).toBe(false)
-    expect(result.errors.some(error => error.path === '/@type')).toBe(true)
+    expect(result.errors.some((error) => error.path === '/@type')).toBe(true)
   })
 
   it('exposes a single profile in the registry', () => {
-    expect(getVersions('schemaorg').map(info => info.version)).toEqual(['latest'])
+    expect(getVersions('schemaorg').map((info) => info.version)).toEqual(['latest'])
     expect(getSchema('schemaorg', 'latest')).toBeDefined()
   })
 
   it('warns when a version is forced on the version-less profile', () => {
-    const result = lintSchemaOrgObject({'@context': 'https://schema.org', '@type': 'SoftwareSourceCode', name: 'x'}, {version: '1.0'})
+    const result = lintSchemaOrgObject(
+      {'@context': 'https://schema.org', '@type': 'SoftwareSourceCode', name: 'x'},
+      {version: '1.0'}
+    )
     expect(result.version).toBe('latest')
-    expect(result.warnings.some(warning => warning.rule === 'schemaorg/version-ignored')).toBe(true)
+    expect(result.warnings.some((warning) => warning.rule === 'schemaorg/version-ignored')).toBe(
+      true
+    )
   })
 })
 

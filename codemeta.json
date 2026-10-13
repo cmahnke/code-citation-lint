@@ -14,7 +14,7 @@
   "license": "MIT",
   "codeRepository": "https://github.com/cmahnke/code-citation-lint",
   "issueTracker": "https://github.com/cmahnke/code-citation-lint/issues",
-  "softwareVersion": "0.1.0",
+  "softwareVersion": "0.1.1",
   "datePublished": "2026-10-13",
   "developmentStatus": "https://www.repostatus.org/#active",
   "keywords": [

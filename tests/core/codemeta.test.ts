@@ -7,7 +7,10 @@ import {versionFromContextUrl, isUnversionedContextUrl} from '../../src/detect.j
 
 const fixtures = path.resolve(import.meta.dirname, '../fixtures')
 
-const CONTEXTS: {version: string; file: string}[] = CODEMETA_VERSIONS.map(info => ({version: info.version, file: `valid-${info.version}.json`}))
+const CONTEXTS: {version: string; file: string}[] = CODEMETA_VERSIONS.map((info) => ({
+  version: info.version,
+  file: `valid-${info.version}.json`
+}))
 
 describe('CodeMeta schema validation (all versions)', () => {
   for (const {version, file} of CONTEXTS) {
@@ -28,7 +31,7 @@ describe('CodeMeta schema validation (all versions)', () => {
     const result = lintCodeMetaContent(content)
     expect(result.valid).toBe(false)
     expect(result.version).toBe('3.0')
-    const messages = result.errors.map(error => error.message).join('\n')
+    const messages = result.errors.map((error) => error.message).join('\n')
     expect(messages).toContain('contIntegration')
     expect(messages).toContain('thisIsNotARealTerm')
   })
@@ -44,7 +47,7 @@ describe('CodeMeta schema validation (all versions)', () => {
     const content = readFileSync(path.join(fixtures, 'codemeta/invalid-json.json'), 'utf8')
     const result = lintCodeMetaContent(content)
     expect(result.valid).toBe(false)
-    expect(result.errors.some(error => error.rule === 'codemeta/parse')).toBe(true)
+    expect(result.errors.some((error) => error.rule === 'codemeta/parse')).toBe(true)
   })
 })
 
@@ -53,27 +56,34 @@ describe('CodeMeta lint rules', () => {
     const content = readFileSync(path.join(fixtures, 'codemeta/warnings.json'), 'utf8')
     const result = lintCodeMetaContent(content)
     expect(result.valid).toBe(true)
-    const rules = result.warnings.map(warning => warning.rule)
+    const rules = result.warnings.map((warning) => warning.rule)
     expect(rules).toContain('codemeta/missing-description')
     expect(rules).toContain('codemeta/missing-license')
-    expect(result.warnings.some(warning => warning.rule === 'codemeta/orcid-format')).toBe(true)
+    expect(result.warnings.some((warning) => warning.rule === 'codemeta/orcid-format')).toBe(true)
   })
 
   it('treats an unrecognized @context as a warning', () => {
-    const result = lintCodeMetaObject({'@context': 'https://example.org/not-codemeta', name: 'x'}, {})
-    expect(result.warnings.some(warning => warning.rule === 'codemeta/context-unrecognized')).toBe(true)
+    const result = lintCodeMetaObject(
+      {'@context': 'https://example.org/not-codemeta', name: 'x'},
+      {}
+    )
+    expect(
+      result.warnings.some((warning) => warning.rule === 'codemeta/context-unrecognized')
+    ).toBe(true)
   })
 
   it('warns about unversioned contexts', () => {
     const result = lintCodeMetaObject({'@context': 'https://w3id.org/codemeta', name: 'x'}, {})
     expect(result.version).toBe('4.0')
-    expect(result.warnings.some(warning => warning.rule === 'codemeta/context-unversioned')).toBe(true)
+    expect(result.warnings.some((warning) => warning.rule === 'codemeta/context-unversioned')).toBe(
+      true
+    )
   })
 
   it('detects a codemeta-like document without @context', () => {
     const result = lintCodeMetaObject({name: 'x', description: 'y', author: []}, {})
     expect(result.type ?? 'codemeta').toBe('codemeta')
-    expect(result.warnings.some(warning => warning.rule === 'codemeta/no-context')).toBe(true)
+    expect(result.warnings.some((warning) => warning.rule === 'codemeta/no-context')).toBe(true)
   })
 })
 

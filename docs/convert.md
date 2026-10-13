@@ -52,61 +52,68 @@ Conversions report what they could not map as `issues` (library) / stderr lines 
 
 ## CFF → CodeMeta / schema.org mapping
 
-| CITATION.cff | Output |
-|---|---|
-| `title` | `name` |
-| `abstract` | `description` |
-| `keywords` | `keywords` |
-| `version` | `version` |
-| `date-released` | `datePublished` |
-| `license` | `license` as `https://spdx.org/licenses/{license}`; when `license` is absent, `license-url` is used as-is |
-| `doi`, `identifiers[type=doi]` | `identifier` as `https://doi.org/…` (doi identifiers win over the top-level `doi`) |
-| `type: dataset` | `@type: Dataset`; datasets lose `codeRepository` (as in cffconvert) |
-| `repository-code` → `repository` → `repository-artifact` | `codeRepository` (first present wins) |
-| `identifiers[type=url].value` → `url` → `repository` → `repository-code` → `repository-artifact` | `url` |
-| person author | `{@type: Person, givenName, familyName, affiliation: {@type: Organization, name}, alternateName, email, @id: orcid}` — fields included as present |
-| entity author (`name`) | `{@type: Organization, name, alternateName, email, @id: orcid}` |
+| CITATION.cff                                                                                     | Output                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`                                                                                          | `name`                                                                                                                                            |
+| `abstract`                                                                                       | `description`                                                                                                                                     |
+| `keywords`                                                                                       | `keywords`                                                                                                                                        |
+| `version`                                                                                        | `version`                                                                                                                                         |
+| `date-released`                                                                                  | `datePublished`                                                                                                                                   |
+| `license`                                                                                        | `license` as `https://spdx.org/licenses/{license}`; when `license` is absent, `license-url` is used as-is                                         |
+| `doi`, `identifiers[type=doi]`                                                                   | `identifier` as `https://doi.org/…` (doi identifiers win over the top-level `doi`)                                                                |
+| `type: dataset`                                                                                  | `@type: Dataset`; datasets lose `codeRepository` (as in cffconvert)                                                                               |
+| `repository-code` → `repository` → `repository-artifact`                                         | `codeRepository` (first present wins)                                                                                                             |
+| `identifiers[type=url].value` → `url` → `repository` → `repository-code` → `repository-artifact` | `url`                                                                                                                                             |
+| person author                                                                                    | `{@type: Person, givenName, familyName, affiliation: {@type: Organization, name}, alternateName, email, @id: orcid}` — fields included as present |
+| entity author (`name`)                                                                           | `{@type: Organization, name, alternateName, email, @id: orcid}`                                                                                   |
 
 Person `familyName` merges `name-particle`, `family-names` and `name-suffix` (as cffconvert's `_get_full_last_name`).
 
 ## CFF → Zenodo mapping (cffconvert parity)
 
-| CITATION.cff | `.zenodo.json` |
-|---|---|
-| `title` | `title` |
-| `abstract` | `description` |
-| `keywords` | `keywords` |
-| `version` | `version` |
-| `date-released` | `publication_date` |
-| `license` | `license: {id}` |
-| `type` | `upload_type: software` or `dataset` |
-| person author | `{name: "FullLastName, GivenNames", affiliation, orcid}` (bare ORCID id, `https://orcid.org/` stripped; given-only, family-only, alias-only, orcid-only or affiliation-only authors map to the fields they have) |
-| entity author (`name`) | `{name, affiliation, orcid}` (`alias` is ignored when `name` is present) |
-| `identifiers` (except `type: other`), then `doi` | `related_identifiers` with `scheme` and relation (identifiers in the known relation set or without a `relation` get `isSupplementedBy`; anything else gets its lowercased-first relation), deduplicated |
-| `repository` → `repository-artifact` → `repository-code` → `url` | `related_identifiers` with `scheme: url` |
+| CITATION.cff                                                     | `.zenodo.json`                                                                                                                                                                                                   |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`                                                          | `title`                                                                                                                                                                                                          |
+| `abstract`                                                       | `description`                                                                                                                                                                                                    |
+| `keywords`                                                       | `keywords`                                                                                                                                                                                                       |
+| `version`                                                        | `version`                                                                                                                                                                                                        |
+| `date-released`                                                  | `publication_date`                                                                                                                                                                                               |
+| `license`                                                        | `license: {id}`                                                                                                                                                                                                  |
+| `type`                                                           | `upload_type: software` or `dataset`                                                                                                                                                                             |
+| person author                                                    | `{name: "FullLastName, GivenNames", affiliation, orcid}` (bare ORCID id, `https://orcid.org/` stripped; given-only, family-only, alias-only, orcid-only or affiliation-only authors map to the fields they have) |
+| entity author (`name`)                                           | `{name, affiliation, orcid}` (`alias` is ignored when `name` is present)                                                                                                                                         |
+| `identifiers` (except `type: other`), then `doi`                 | `related_identifiers` with `scheme` and relation (identifiers in the known relation set or without a `relation` get `isSupplementedBy`; anything else gets its lowercased-first relation), deduplicated          |
+| `repository` → `repository-artifact` → `repository-code` → `url` | `related_identifiers` with `scheme: url`                                                                                                                                                                         |
 
 ## CodeMeta → CFF mapping (reverse conversion)
 
-| CodeMeta | CITATION.cff (1.2.0 by default) |
-|---|---|
-| `name` (or `title`) | `title` |
-| `description` (or `abstract`) | `abstract` |
-| `softwareVersion` (or `version`) | `version` |
-| `datePublished` / `dateModified` | `date-released` (normalized to YYYY-MM-DD) |
-| `license` (or `licenseId`) | bare SPDX id (SPDX URLs are reduced; usable object `@id`/`id`/`url`/`name` values are preserved, opaque objects are omitted) |
-| `keywords` (or `tags`) | `keywords` |
-| `codeRepository` | `repository-code` |
-| `url` (only when different from `repository-code`) | `url` |
-| `identifier` (DOI URL, `doi:` prefix, `dx.doi.org`, or bare `10.xxxx/...`) | `doi` (bare DOI; non-DOI identifiers stay unmapped) |
-| `author` / `creator` / `agents` / `person` Person | `{given-names, family-names, email, affiliation (organization name), orcid (@id)}` |
-| `author` Organization (has `name`) | `{name, email}` |
-| `author` Role or other shapes | mapped by shape like the cases above (no special Role handling); unusable values are omitted |
-| — | `cff-version`, `message` (default text, always synthesized silently) |
+| CodeMeta                                                                   | CITATION.cff (1.2.0 by default)                                                                                              |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `name` (or `title`)                                                        | `title`                                                                                                                      |
+| `description` (or `abstract`)                                              | `abstract`                                                                                                                   |
+| `softwareVersion` (or `version`)                                           | `version`                                                                                                                    |
+| `datePublished` / `dateModified`                                           | `date-released` (normalized to YYYY-MM-DD)                                                                                   |
+| `license` (or `licenseId`)                                                 | bare SPDX id (SPDX URLs are reduced; usable object `@id`/`id`/`url`/`name` values are preserved, opaque objects are omitted) |
+| `keywords` (or `tags`)                                                     | `keywords`                                                                                                                   |
+| `codeRepository`                                                           | `repository-code`                                                                                                            |
+| `url` (only when different from `repository-code`)                         | `url`                                                                                                                        |
+| `identifier` (DOI URL, `doi:` prefix, `dx.doi.org`, or bare `10.xxxx/...`) | `doi` (bare DOI; non-DOI identifiers stay unmapped)                                                                          |
+| `author` / `creator` / `agents` / `person` Person                          | `{given-names, family-names, email, affiliation (organization name), orcid (@id)}`                                           |
+| `author` Organization (has `name`)                                         | `{name, email}`                                                                                                              |
+| `author` Role or other shapes                                              | mapped by shape like the cases above (no special Role handling); unusable values are omitted                                 |
+| —                                                                          | `cff-version`, `message` (default text, always synthesized silently)                                                         |
 
 ## Library
 
 ```js
-import {cffToCodemeta, cffToSchemaOrg, cffToZenodo, codemetaToCff, convertContent, convertDocument} from '@projektemacher/code-citation-lint'
+import {
+  cffToCodemeta,
+  cffToSchemaOrg,
+  cffToZenodo,
+  codemetaToCff,
+  convertContent,
+  convertDocument
+} from '@projektemacher/code-citation-lint'
 
 const document = cffToCodemeta(parsedCff, {codemetaVersion: '4.0'})
 const schemaOrg = cffToSchemaOrg(parsedCff)

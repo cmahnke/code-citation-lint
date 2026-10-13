@@ -7,7 +7,7 @@ const srcDir = path.resolve(import.meta.dirname, '../../src')
 
 describe('rule catalog', () => {
   it('has unique rule ids', () => {
-    const ids = RULE_CATALOG.map(info => info.rule)
+    const ids = RULE_CATALOG.map((info) => info.rule)
     expect(new Set(ids).size).toBe(ids.length)
   })
 
@@ -29,7 +29,9 @@ describe('rule catalog', () => {
           visit(filePath)
         } else if (entry.name.endsWith('.ts')) {
           const content = readFileSync(filePath, 'utf8')
-          for (const match of content.matchAll(/'(cff|codemeta|schemaorg|crosscheck|discovery|init|convert|lint|io|fetch)\/[a-z-]+'/g)) {
+          for (const match of content.matchAll(
+            /'(cff|codemeta|schemaorg|crosscheck|discovery|init|convert|lint|io|fetch)\/[a-z-]+'/g
+          )) {
             emitted.add((match[0] as string).slice(1, -1))
           }
           if (content.includes("rule: 'schema'")) emitted.add('schema')
@@ -38,7 +40,7 @@ describe('rule catalog', () => {
     }
     visit(srcDir)
     const catalog = new Set(ruleIds())
-    const missing = [...emitted].filter(rule => !catalog.has(rule))
+    const missing = [...emitted].filter((rule) => !catalog.has(rule))
     expect(missing).toEqual([])
   })
 

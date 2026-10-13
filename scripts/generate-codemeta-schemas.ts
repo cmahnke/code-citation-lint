@@ -57,7 +57,6 @@ const LATEST_ALIASES = [
   'https://raw.githubusercontent.com/codemeta/codemeta/main/codemeta.jsonld'
 ]
 
-
 function contextEnum(version: string): string[] {
   const urls = CONTEXT_URLS[version] ?? []
   return [...urls, ...LATEST_ALIASES]
@@ -140,7 +139,7 @@ async function main(): Promise<void> {
   }
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error)
   process.exitCode = 1
 })

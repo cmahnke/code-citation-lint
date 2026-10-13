@@ -28,7 +28,13 @@
  */
 
 import type {LintFinding, LintResult} from './types.js'
-import {codemetaContextUrl, getLatestVersion, getVersions, isVersionRegistered, normalizeVersion} from './registry.js'
+import {
+  codemetaContextUrl,
+  getLatestVersion,
+  getVersions,
+  isVersionRegistered,
+  normalizeVersion
+} from './registry.js'
 import {stringifyDates} from './cff/lint.js'
 import {lintCodeMetaObject} from './codemeta/lint.js'
 import {lintSchemaOrgObject} from './schemaorg/lint.js'
@@ -97,7 +103,9 @@ interface CffAuthor {
 
 /** cffconvert's _get_full_last_name: particle + family names + suffix. */
 function fullLastName(author: CffAuthor): string {
-  return [author['name-particle'], author['family-names'], author['name-suffix']].filter(part => part !== undefined).join(' ')
+  return [author['name-particle'], author['family-names'], author['name-suffix']]
+    .filter((part) => part !== undefined)
+    .join(' ')
 }
 
 /** Converts one CFF author (person or entity) to a schema.org agent, mirroring cffconvert. */
@@ -114,7 +122,11 @@ export function authorToSchemaOrg(author: CffAuthor): object {
   const person: Record<string, unknown> = {'@type': 'Person'}
   if (author.orcid !== undefined) person['@id'] = author.orcid
   if (author['given-names'] !== undefined) person.givenName = author['given-names']
-  if (author['family-names'] !== undefined || author['name-particle'] !== undefined || author['name-suffix'] !== undefined) {
+  if (
+    author['family-names'] !== undefined ||
+    author['name-particle'] !== undefined ||
+    author['name-suffix'] !== undefined
+  ) {
     person.familyName = fullLastName(author)
   }
   if (author.alias !== undefined) person.alternateName = author.alias
@@ -149,8 +161,14 @@ function defined(value: unknown): boolean {
 
 /** Resolves codeRepository/url per the cffconvert behavior matrix. */
 function resolveUrls(cff: CffDocument): {codeRepository?: string; url?: string} {
-  const codeRepository = (cff['repository-code'] ?? cff.repository ?? cff['repository-artifact']) as string | undefined
-  const url = (firstIdentifierUrl(cff) ?? cff.url ?? cff.repository ?? cff['repository-code'] ?? cff['repository-artifact']) as string | undefined
+  const codeRepository = (cff['repository-code'] ??
+    cff.repository ??
+    cff['repository-artifact']) as string | undefined
+  const url = (firstIdentifierUrl(cff) ??
+    cff.url ??
+    cff.repository ??
+    cff['repository-code'] ??
+    cff['repository-artifact']) as string | undefined
   return {
     ...(defined(codeRepository) ? {codeRepository} : {}),
     ...(defined(url) ? {url} : {})
@@ -186,11 +204,13 @@ export function cffToSchemaOrg(cff: object): object {
     ...(defined(record.title) ? {name: record.title} : {}),
     ...(defined(record.abstract) ? {description: record.abstract} : {}),
     ...(Array.isArray(record.authors) && record.authors.length > 0
-      ? {author: record.authors.map(author => authorToSchemaOrg(author))}
+      ? {author: record.authors.map((author) => authorToSchemaOrg(author))}
       : {}),
     ...(defined(datePublished) ? {datePublished} : {}),
     ...(defined(doi) ? {identifier: `https://doi.org/${doi}`} : {}),
-    ...(Array.isArray(record.keywords) && record.keywords.length > 0 ? {keywords: record.keywords} : {}),
+    ...(Array.isArray(record.keywords) && record.keywords.length > 0
+      ? {keywords: record.keywords}
+      : {}),
     ...(defined(record.license)
       ? {license: `https://spdx.org/licenses/${record.license}`}
       : defined(record['license-url'])
@@ -206,10 +226,11 @@ export function cffToSchemaOrg(cff: object): object {
 
 /** Converts a CFF document into a CodeMeta document (latest version by default). */
 export function cffToCodemeta(cff: object, options: ConvertOptions = {}): object {
-  const requested = options.codemetaVersion !== undefined ? normalizeVersion(options.codemetaVersion) : undefined
+  const requested =
+    options.codemetaVersion !== undefined ? normalizeVersion(options.codemetaVersion) : undefined
   if (requested !== undefined && !isVersionRegistered('codemeta', requested)) {
     const available = getVersions('codemeta')
-      .map(info => info.version)
+      .map((info) => info.version)
       .join(', ')
     throw new Error(`Unsupported CodeMeta version ${requested} (available: ${available}).`)
   }
@@ -221,7 +242,8 @@ export function cffToCodemeta(cff: object, options: ConvertOptions = {}): object
 
 /** Converts one CFF author to a Zenodo creator, mirroring cffconvert's ZenodoAuthor. */
 function authorToZenodo(author: CffAuthor): Record<string, unknown> | undefined {
-  const orcid = author.orcid !== undefined ? author.orcid.replace('https://orcid.org/', '') : undefined
+  const orcid =
+    author.orcid !== undefined ? author.orcid.replace('https://orcid.org/', '') : undefined
   if (author.name !== undefined) {
     return {
       ...(defined(author.affiliation) ? {affiliation: author.affiliation} : {}),
@@ -230,15 +252,24 @@ function authorToZenodo(author: CffAuthor): Record<string, unknown> | undefined 
     }
   }
   if (author['given-names'] !== undefined) {
-    const hasLast = author['family-names'] !== undefined || author['name-particle'] !== undefined || author['name-suffix'] !== undefined
-    const name = hasLast ? `${fullLastName(author)}, ${author['given-names']}` : author['given-names']
+    const hasLast =
+      author['family-names'] !== undefined ||
+      author['name-particle'] !== undefined ||
+      author['name-suffix'] !== undefined
+    const name = hasLast
+      ? `${fullLastName(author)}, ${author['given-names']}`
+      : author['given-names']
     return {
       ...(defined(author.affiliation) ? {affiliation: author.affiliation} : {}),
       name,
       ...(orcid !== undefined ? {orcid} : {})
     }
   }
-  if (author['family-names'] !== undefined || author['name-particle'] !== undefined || author['name-suffix'] !== undefined) {
+  if (
+    author['family-names'] !== undefined ||
+    author['name-particle'] !== undefined ||
+    author['name-suffix'] !== undefined
+  ) {
     return {
       ...(defined(author.affiliation) ? {affiliation: author.affiliation} : {}),
       name: fullLastName(author),
@@ -297,20 +328,31 @@ export function cffToZenodo(cff: object): object {
   for (const cffKey of ['repository', 'repository-artifact', 'repository-code', 'url'] as const) {
     const url = record[cffKey]
     if (!defined(url) || seen.includes(url as string)) continue
-    relatedIdentifiers.push({identifier: url as string, relation: 'isSupplementedBy', scheme: 'url'})
+    relatedIdentifiers.push({
+      identifier: url as string,
+      relation: 'isSupplementedBy',
+      scheme: 'url'
+    })
     seen.push(url as string)
   }
 
-  const publicationDate = (record['date-released'] as unknown) instanceof Date
-    ? formatLocalDate(record['date-released'] as unknown as Date)
-    : record['date-released']
+  const publicationDate =
+    (record['date-released'] as unknown) instanceof Date
+      ? formatLocalDate(record['date-released'] as unknown as Date)
+      : record['date-released']
   const output: Record<string, unknown> = {
     ...(defined(record.title) ? {title: record.title} : {}),
     ...(Array.isArray(record.authors) && record.authors.length > 0
-      ? {creators: record.authors.map(author => authorToZenodo(author)).filter(creator => creator !== undefined)}
+      ? {
+          creators: record.authors
+            .map((author) => authorToZenodo(author))
+            .filter((creator) => creator !== undefined)
+        }
       : {}),
     ...(defined(record.abstract) ? {description: record.abstract} : {}),
-    ...(Array.isArray(record.keywords) && record.keywords.length > 0 ? {keywords: record.keywords} : {}),
+    ...(Array.isArray(record.keywords) && record.keywords.length > 0
+      ? {keywords: record.keywords}
+      : {}),
     ...(defined(record.license) ? {license: {id: record.license}} : {}),
     ...(defined(publicationDate) ? {publication_date: publicationDate} : {}),
     ...(relatedIdentifiers.length > 0 ? {related_identifiers: relatedIdentifiers} : {}),
@@ -364,10 +406,11 @@ function usableString(value: unknown): string | undefined {
 /** Converts a CodeMeta document into a CFF document (latest released version by default). */
 export function codemetaToCff(codemeta: object, options: ConvertOptions = {}): object {
   const record = codemeta as Record<string, unknown>
-  const requested = options.cffVersion !== undefined ? normalizeVersion(options.cffVersion) : undefined
+  const requested =
+    options.cffVersion !== undefined ? normalizeVersion(options.cffVersion) : undefined
   if (requested !== undefined && !isVersionRegistered('cff', requested)) {
     const available = getVersions('cff')
-      .map(info => info.version)
+      .map((info) => info.version)
       .join(', ')
     throw new Error(`Unsupported CFF version ${requested} (available: ${available}).`)
   }
@@ -432,7 +475,8 @@ export function codemetaToCff(codemeta: object, options: ConvertOptions = {}): o
   return output
 }
 
-const CFF_DEFAULT_MESSAGE = 'If you use this software, please cite it using the metadata from this file.'
+const CFF_DEFAULT_MESSAGE =
+  'If you use this software, please cite it using the metadata from this file.'
 
 /** Normalizes a keywords/tags value to a string array, if possible. */
 function normalizeKeywords(value: unknown): string[] | undefined {
@@ -527,7 +571,12 @@ function convertCodemetaAuthors(record: Record<string, unknown>): CffAuthor[] {
       continue
     }
     const affiliation = affiliationName(entry.affiliation)
-    const orcid = typeof entry['@id'] === 'string' ? (entry['@id'] as string) : typeof entry['id'] === 'string' ? (entry['id'] as string) : undefined
+    const orcid =
+      typeof entry['@id'] === 'string'
+        ? (entry['@id'] as string)
+        : typeof entry['id'] === 'string'
+          ? (entry['id'] as string)
+          : undefined
     result.push({
       ...(defined(entry.givenName) ? {'given-names': String(entry.givenName)} : {}),
       ...(defined(entry.familyName) ? {'family-names': String(entry.familyName)} : {}),
@@ -561,9 +610,28 @@ function affiliationName(value: unknown): string | undefined {
 
 /** CFF keys that the reverse conversion consumes. */
 export const CFF_CONSUMED_CODEMETA_KEYS = new Set([
-  '@context', '@type', '@id', 'name', 'title', 'description', 'abstract', 'author', 'creator', 'agents', 'person',
-  'softwareVersion', 'version', 'datePublished', 'dateModified', 'license', 'licenseId', 'keywords', 'tags',
-  'codeRepository', 'url', 'identifier'
+  '@context',
+  '@type',
+  '@id',
+  'name',
+  'title',
+  'description',
+  'abstract',
+  'author',
+  'creator',
+  'agents',
+  'person',
+  'softwareVersion',
+  'version',
+  'datePublished',
+  'dateModified',
+  'license',
+  'licenseId',
+  'keywords',
+  'tags',
+  'codeRepository',
+  'url',
+  'identifier'
 ])
 
 /**
@@ -571,18 +639,26 @@ export const CFF_CONSUMED_CODEMETA_KEYS = new Set([
  * The source must be a CFF document for codemeta/schemaorg/zenodo targets and
  * a CodeMeta document for the cff target.
  */
-export function convertDocument(source: object, to: ConvertTarget, options: ConvertOptions = {}): ConvertOutcome {
+export function convertDocument(
+  source: object,
+  to: ConvertTarget,
+  options: ConvertOptions = {}
+): ConvertOutcome {
   const issues: LintFinding[] = []
   const sourceIsCff = typeof (source as Record<string, unknown>)['cff-version'] === 'string'
 
   if (to === 'cff') {
     if (sourceIsCff) {
-      throw new Error('Converting to cff requires a CodeMeta document, but the input is a CFF document.')
+      throw new Error(
+        'Converting to cff requires a CodeMeta document, but the input is a CFF document.'
+      )
     }
     return convertCodemetaToCff(source, options, issues)
   }
   if (!sourceIsCff) {
-    throw new Error(`Converting to ${to} requires a CFF document, but the input has no cff-version.`)
+    throw new Error(
+      `Converting to ${to} requires a CFF document, but the input has no cff-version.`
+    )
   }
   const record = source as CffDocument
   let document: object
@@ -590,14 +666,28 @@ export function convertDocument(source: object, to: ConvertTarget, options: Conv
     document = cffToZenodo(record)
     for (const key of Object.keys(record)) {
       if (!ZENODO_CONSUMED_KEYS.has(key)) {
-        issues.push(finding('info', 'convert/unmapped', `The CFF key "${key}" has no Zenodo equivalent and was dropped.`, `/${key}`))
+        issues.push(
+          finding(
+            'info',
+            'convert/unmapped',
+            `The CFF key "${key}" has no Zenodo equivalent and was dropped.`,
+            `/${key}`
+          )
+        )
       }
     }
   } else {
     document = to === 'schemaorg' ? cffToSchemaOrg(record) : cffToCodemeta(record, options)
     for (const key of Object.keys(record)) {
       if (!CODEMETA_CONSUMED_KEYS.has(key)) {
-        issues.push(finding('info', 'convert/unmapped', `The CFF key "${key}" has no ${to} equivalent and was dropped.`, `/${key}`))
+        issues.push(
+          finding(
+            'info',
+            'convert/unmapped',
+            `The CFF key "${key}" has no ${to} equivalent and was dropped.`,
+            `/${key}`
+          )
+        )
       }
     }
   }
@@ -636,7 +726,11 @@ const CODEMETA_CONSUMED_KEYS = new Set([
   'type'
 ])
 
-function convertCodemetaToCff(codemeta: object, options: ConvertOptions, issues: LintFinding[]): ConvertOutcome {
+function convertCodemetaToCff(
+  codemeta: object,
+  options: ConvertOptions,
+  issues: LintFinding[]
+): ConvertOutcome {
   const document = codemetaToCff(codemeta, options)
   const target: ConvertTarget = 'cff'
   const outcome: ConvertOutcome = {document, target, issues}
@@ -647,22 +741,48 @@ function convertCodemetaToCff(codemeta: object, options: ConvertOptions, issues:
   for (const key of Object.keys(record)) {
     if (key === 'identifier') {
       if (extractDoi(record[key]) === undefined) {
-        issues.push(finding('info', 'convert/unmapped', `The CodeMeta term "${key}" has no CFF equivalent and was dropped.`, `/${key}`))
+        issues.push(
+          finding(
+            'info',
+            'convert/unmapped',
+            `The CodeMeta term "${key}" has no CFF equivalent and was dropped.`,
+            `/${key}`
+          )
+        )
       }
       continue
     }
     if (!CFF_CONSUMED_CODEMETA_KEYS.has(key)) {
-      issues.push(finding('info', 'convert/unmapped', `The CodeMeta term "${key}" has no CFF equivalent and was dropped.`, `/${key}`))
+      issues.push(
+        finding(
+          'info',
+          'convert/unmapped',
+          `The CodeMeta term "${key}" has no CFF equivalent and was dropped.`,
+          `/${key}`
+        )
+      )
     }
   }
 
   // Required CFF fields
   const cffRecord = document as Record<string, unknown>
   if (cffRecord.title === undefined) {
-    issues.push(finding('error', 'convert/missing-required', 'The CodeMeta document has no name, but CFF requires a title.'))
+    issues.push(
+      finding(
+        'error',
+        'convert/missing-required',
+        'The CodeMeta document has no name, but CFF requires a title.'
+      )
+    )
   }
   if (cffRecord.authors === undefined) {
-    issues.push(finding('error', 'convert/missing-required', 'The CodeMeta document has no author, but CFF requires authors.'))
+    issues.push(
+      finding(
+        'error',
+        'convert/missing-required',
+        'The CodeMeta document has no author, but CFF requires authors.'
+      )
+    )
   }
 
   if (options.lint !== false) {
@@ -673,9 +793,18 @@ function convertCodemetaToCff(codemeta: object, options: ConvertOptions, issues:
 }
 
 /** Parses content (YAML or JSON) and converts it to the given target. */
-export function convertContent(content: string, to: ConvertTarget, options: ConvertOptions = {}): ConvertOutcome {
+export function convertContent(
+  content: string,
+  to: ConvertTarget,
+  options: ConvertOptions = {}
+): ConvertOutcome {
   const parsed = parseDocument(content)
-  if (parsed.document === undefined || parsed.document === null || typeof parsed.document !== 'object' || Array.isArray(parsed.document)) {
+  if (
+    parsed.document === undefined ||
+    parsed.document === null ||
+    typeof parsed.document !== 'object' ||
+    Array.isArray(parsed.document)
+  ) {
     throw new Error(parsed.error ?? 'Content could not be parsed into an object.')
   }
   let source = parsed.document as Record<string, unknown>

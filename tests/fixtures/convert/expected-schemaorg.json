@@ -29,10 +29,7 @@
   ],
   "datePublished": "2024-06-01",
   "identifier": "https://doi.org/10.5281/zenodo.999",
-  "keywords": [
-    "conversion",
-    "test"
-  ],
+  "keywords": ["conversion", "test"],
   "license": "https://spdx.org/licenses/MIT",
   "codeRepository": "https://github.com/org/tool",
   "url": "https://tool.example.org",

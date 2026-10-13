@@ -2,5 +2,12 @@
   "@context": "https://w3id.org/codemeta/4.0",
   "@type": "SoftwareSourceCode",
   "name": "Sparse CodeMeta Example",
-  "author": [{"@type": "Person", "givenName": "Ada", "familyName": "Lovelace", "id": "https://orcid.org/0000-0000-0000-00"}]
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ada",
+      "familyName": "Lovelace",
+      "id": "https://orcid.org/0000-0000-0000-00"
+    }
+  ]
 }

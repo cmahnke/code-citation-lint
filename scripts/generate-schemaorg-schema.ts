@@ -157,7 +157,12 @@ async function main(): Promise<void> {
     '@context': {
       description: 'JSON-LD context. Must reference schema.org.',
       anyOf: [
-        {anyOf: [{enum: CONTEXT_URLS}, {type: 'string', pattern: '^https?://schema\\.org(/version/[\\w.]+)?/?$'}]},
+        {
+          anyOf: [
+            {enum: CONTEXT_URLS},
+            {type: 'string', pattern: '^https?://schema\\.org(/version/[\\w.]+)?/?$'}
+          ]
+        },
         {type: 'array', items: {anyOf: [{enum: CONTEXT_URLS}, {type: 'string'}, {type: 'object'}]}}
       ]
     },
@@ -187,7 +192,7 @@ async function main(): Promise<void> {
   console.log(`OK schemaorg: ${TERMS.length} terms -> ${path.relative(process.cwd(), outFile)}`)
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error)
   process.exitCode = 1
 })

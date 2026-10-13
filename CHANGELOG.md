@@ -4,7 +4,7 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.1] - 2026-10-13
 
 ### Added
 
@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- `npm run lint` now runs `prettier --check .` before eslint; the repository is prettier-formatted (existing code style pinned via `bracketSpacing: false`), with vendored/generated files and fixtures excluded via `.prettierignore`
 - Removed the unused `normalizeCodeMetaVersion` alias from `src/codemeta/lint.ts` (it was never part of the public `index.ts` API)
 - CLI contract: no targets without `--stdin` prints an error/usage to stderr and exits `2`; `--stdin` with positional targets is rejected with exit `2`; `--format` is validated case-insensitively (`text`/`json`, otherwise `InvalidArgumentError`)
 - CLI `convert`: stdout carries only the serialized converted document(s); `# <target>` markers, `Wrote ...` messages, issues and failures go to stderr

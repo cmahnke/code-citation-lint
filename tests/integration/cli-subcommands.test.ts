@@ -11,8 +11,15 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const fixtures = path.resolve(root, 'tests/fixtures')
 const cli = path.join(root, 'dist/cli.js')
 
-function run(args: string[], options: {input?: string; allowFailure?: boolean} = {}): {stdout: string; stderr: string; status: number} {
-  const result = spawnSync('node', [cli, ...args], {cwd: root, input: options.input, encoding: 'utf8'})
+function run(
+  args: string[],
+  options: {input?: string; allowFailure?: boolean} = {}
+): {stdout: string; stderr: string; status: number} {
+  const result = spawnSync('node', [cli, ...args], {
+    cwd: root,
+    input: options.input,
+    encoding: 'utf8'
+  })
   const status = result.status ?? 1
   if (status !== 0 && !options.allowFailure) {
     throw new Error(`CLI exited with ${status}: ${result.stderr}`)
@@ -28,7 +35,9 @@ describe('lint subcommand', () => {
   })
 
   it('is the default even with leading options', () => {
-    const {stdout, status} = run(['-s', path.join(fixtures, 'cff/warnings.cff')], {allowFailure: true})
+    const {stdout, status} = run(['-s', path.join(fixtures, 'cff/warnings.cff')], {
+      allowFailure: true
+    })
     // the document itself is valid; --strict only escalates the exit code
     expect(status).toBe(1)
     expect(stdout).toContain('VALID')
@@ -49,8 +58,14 @@ describe('lint subcommand', () => {
 
 describe('convert subcommand', () => {
   const source = path.join(fixtures, 'convert/source.cff')
-  const expectedCodemeta = readFileSync(path.join(fixtures, 'convert/expected-codemeta.json'), 'utf8')
-  const expectedSchemaorg = readFileSync(path.join(fixtures, 'convert/expected-schemaorg.json'), 'utf8')
+  const expectedCodemeta = readFileSync(
+    path.join(fixtures, 'convert/expected-codemeta.json'),
+    'utf8'
+  )
+  const expectedSchemaorg = readFileSync(
+    path.join(fixtures, 'convert/expected-schemaorg.json'),
+    'utf8'
+  )
 
   it('writes codemeta to stdout with "-"', () => {
     const {stdout, status} = run(['convert', source, '-'])
@@ -70,8 +85,12 @@ describe('convert subcommand', () => {
       const output = path.join(dir, 'nested', 'out')
       const {status} = run(['convert', '--to', 'codemeta,schemaorg', source, output])
       expect(status).toBe(0)
-      expect(JSON.parse(readFileSync(path.join(output, 'codemeta.json'), 'utf8'))).toEqual(JSON.parse(expectedCodemeta))
-      expect(JSON.parse(readFileSync(path.join(output, 'schemaorg.json'), 'utf8'))).toEqual(JSON.parse(expectedSchemaorg))
+      expect(JSON.parse(readFileSync(path.join(output, 'codemeta.json'), 'utf8'))).toEqual(
+        JSON.parse(expectedCodemeta)
+      )
+      expect(JSON.parse(readFileSync(path.join(output, 'schemaorg.json'), 'utf8'))).toEqual(
+        JSON.parse(expectedSchemaorg)
+      )
     } finally {
       rmSync(dir, {recursive: true, force: true})
     }
@@ -97,7 +116,9 @@ describe('convert subcommand', () => {
   })
 
   it('fails with exit 1 for invalid CFF input', () => {
-    const {status, stderr} = run(['convert', path.join(fixtures, 'cff/invalid-schema.cff'), '-'], {allowFailure: true})
+    const {status, stderr} = run(['convert', path.join(fixtures, 'cff/invalid-schema.cff'), '-'], {
+      allowFailure: true
+    })
     expect(status).toBe(1)
     expect(stderr).toContain('not a valid CFF document')
   })
@@ -111,7 +132,10 @@ describe('convert subcommand', () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), 'ccl-convert-'))
     try {
       const file = path.join(dir, 'codemeta.json')
-      const {stdout, status} = run(['convert', '-q', path.join(fixtures, 'cff/warnings.cff'), file], {allowFailure: true})
+      const {stdout, status} = run(
+        ['convert', '-q', path.join(fixtures, 'cff/warnings.cff'), file],
+        {allowFailure: true}
+      )
       expect(status).toBe(0)
       expect(stdout).toBe('')
       expect(existsSync(file)).toBe(true)
@@ -140,7 +164,9 @@ describe('convert subcommand: zenodo and cff targets', () => {
       mkdirSync(output, {recursive: true})
       const {status} = run(['convert', '--to', 'zenodo', source, output])
       expect(status).toBe(0)
-      expect(JSON.parse(readFileSync(path.join(output, '.zenodo.json'), 'utf8'))).toEqual(JSON.parse(expectedZenodo))
+      expect(JSON.parse(readFileSync(path.join(output, '.zenodo.json'), 'utf8'))).toEqual(
+        JSON.parse(expectedZenodo)
+      )
     } finally {
       rmSync(dir, {recursive: true, force: true})
     }
@@ -150,7 +176,10 @@ describe('convert subcommand: zenodo and cff targets', () => {
     const {stdout, status} = run(['convert', '--to', 'cff', codemetaSource, '-'])
     expect(status).toBe(0)
     // strip the generated-by header line before comparing
-    const yaml = stdout.split('\n').filter(line => !line.startsWith('#')).join('\n')
+    const yaml = stdout
+      .split('\n')
+      .filter((line) => !line.startsWith('#'))
+      .join('\n')
     expect(parseYaml(yaml)).toEqual(parseYaml(expectedCff))
   })
 
@@ -161,7 +190,9 @@ describe('convert subcommand: zenodo and cff targets', () => {
       mkdirSync(output, {recursive: true})
       const {status} = run(['convert', '--to', 'cff', codemetaSource, output])
       expect(status).toBe(0)
-      expect(readFileSync(path.join(output, 'CITATION.cff'), 'utf8')).toContain('cff-version: 1.2.0')
+      expect(readFileSync(path.join(output, 'CITATION.cff'), 'utf8')).toContain(
+        'cff-version: 1.2.0'
+      )
     } finally {
       rmSync(dir, {recursive: true, force: true})
     }
@@ -174,13 +205,18 @@ describe('convert subcommand: zenodo and cff targets', () => {
   })
 
   it('rejects mixing the cff target with other targets', () => {
-    const {status, stderr} = run(['convert', '--to', 'cff,codemeta', codemetaSource, '-'], {allowFailure: true})
+    const {status, stderr} = run(['convert', '--to', 'cff,codemeta', codemetaSource, '-'], {
+      allowFailure: true
+    })
     expect(status).toBe(2)
     expect(stderr).toContain('Cannot mix')
   })
 
   it('fails on an invalid codemeta input with exit 1', () => {
-    const {status, stderr} = run(['convert', '--to', 'cff', path.join(fixtures, 'codemeta/invalid-schema.json'), '-'], {allowFailure: true})
+    const {status, stderr} = run(
+      ['convert', '--to', 'cff', path.join(fixtures, 'codemeta/invalid-schema.json'), '-'],
+      {allowFailure: true}
+    )
     expect(status).toBe(1)
     expect(stderr).toContain('not a valid CODEMETA document')
   })
@@ -236,7 +272,11 @@ describe('init subcommand', () => {
   it('skips existing files unless --force is given', () => {
     const dir = mkdtempSync(path.join(os.tmpdir(), 'ccl-init-'))
     try {
-      writeFileSync(path.join(dir, 'CITATION.cff'), 'cff-version: 1.2.0\nmessage: keep me\ntitle: keep\nauthors:\n  - name: keep\n', 'utf8')
+      writeFileSync(
+        path.join(dir, 'CITATION.cff'),
+        'cff-version: 1.2.0\nmessage: keep me\ntitle: keep\nauthors:\n  - name: keep\n',
+        'utf8'
+      )
       const first = run(['init', dir])
       expect(first.stdout).toContain('Skipped')
       expect(first.stderr).not.toContain('Skipped')

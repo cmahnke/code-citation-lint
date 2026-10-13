@@ -83,10 +83,11 @@ const customSchemas: SchemaRegistry = {cff: {}, codemeta: {}, schemaorg: {}}
 
 /** Returns all registered versions for a format (bundled + custom). */
 export function getVersions(format: Format): VersionInfo[] {
-  const bundled = format === 'cff' ? CFF_VERSIONS : format === 'codemeta' ? CODEMETA_VERSIONS : SCHEMAORG_VERSIONS
+  const bundled =
+    format === 'cff' ? CFF_VERSIONS : format === 'codemeta' ? CODEMETA_VERSIONS : SCHEMAORG_VERSIONS
   const custom = Object.keys(customSchemas[format] ?? {})
-    .filter(version => !bundled.some(info => info.version === version))
-    .map(version => ({version, status: 'draft' as const}))
+    .filter((version) => !bundled.some((info) => info.version === version))
+    .map((version) => ({version, status: 'draft' as const}))
   return [...bundled, ...custom]
 }
 
@@ -98,7 +99,7 @@ export function getSchema(format: Format, version: string): object | undefined {
 /** The latest registered (and released, if any) version for a format. */
 export function getLatestVersion(format: Format): string {
   const versions = getVersions(format)
-  const released = versions.filter(info => info.status === 'released')
+  const released = versions.filter((info) => info.status === 'released')
   return (released.at(-1) ?? versions.at(-1))?.version ?? ''
 }
 
@@ -114,8 +115,13 @@ export function registerVersion(
 ): void {
   customSchemas[format]![version] = schema
   if (options?.status === 'released') {
-    const registry = format === 'cff' ? CFF_VERSIONS : format === 'codemeta' ? CODEMETA_VERSIONS : SCHEMAORG_VERSIONS
-    if (!registry.some(info => info.version === version)) {
+    const registry =
+      format === 'cff'
+        ? CFF_VERSIONS
+        : format === 'codemeta'
+          ? CODEMETA_VERSIONS
+          : SCHEMAORG_VERSIONS
+    if (!registry.some((info) => info.version === version)) {
       registry.push({version, status: 'released'})
     }
   }
@@ -141,7 +147,10 @@ export function applyRuleConfig(finding: LintFinding, rules?: RuleConfig): LintF
     rules.severities?.[`${base}/*`] ??
     rules.severities?.[base] ??
     rules.severities?.['*']
-  const explicitOff = rules.disable?.includes(rule) || rules.disable?.includes(base) || rules.disable?.includes(`${base}/*`)
+  const explicitOff =
+    rules.disable?.includes(rule) ||
+    rules.disable?.includes(base) ||
+    rules.disable?.includes(`${base}/*`)
   const severity = lookup()
   if (explicitOff || severity === 'off') return null
   if (severity) return {...finding, severity}

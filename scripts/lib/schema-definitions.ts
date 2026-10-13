@@ -26,10 +26,7 @@ export const DEFINITIONS: Record<string, JsonSchemaNode> = {
     ]
   },
   agentOrArray: {
-    anyOf: [
-      {$ref: '#/definitions/agent'},
-      {type: 'array', items: {$ref: '#/definitions/agent'}}
-    ]
+    anyOf: [{$ref: '#/definitions/agent'}, {type: 'array', items: {$ref: '#/definitions/agent'}}]
   },
   agent: {
     type: 'object',
@@ -70,7 +67,10 @@ export function termToSchema(term: string, definition: Record<string, unknown>):
       {type: 'number'},
       {type: 'boolean'},
       {type: 'object'},
-      {type: 'array', items: {anyOf: [{type: 'string'}, {type: 'number'}, {type: 'boolean'}, {type: 'object'}]}}
+      {
+        type: 'array',
+        items: {anyOf: [{type: 'string'}, {type: 'number'}, {type: 'boolean'}, {type: 'object'}]}
+      }
     ]
   }
 }

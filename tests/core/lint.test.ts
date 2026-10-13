@@ -47,13 +47,13 @@ describe('type autodetection', () => {
   it('falls back to sniffing when @context is missing', () => {
     const result = lintObject({name: 'x', description: 'y'}, {})
     expect(result.versionSource).toBe('unknown')
-    expect(result.errors.some(error => error.rule === 'lint/undetected')).toBe(false)
+    expect(result.errors.some((error) => error.rule === 'lint/undetected')).toBe(false)
   })
 
   it('reports undetectable documents', () => {
     const result = lintObject({foo: 'bar'}, {})
     expect(result.valid).toBe(false)
-    expect(result.errors.some(error => error.rule === 'lint/undetected')).toBe(true)
+    expect(result.errors.some((error) => error.rule === 'lint/undetected')).toBe(true)
   })
 })
 

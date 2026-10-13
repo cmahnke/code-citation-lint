@@ -6,7 +6,7 @@ import {
   lintUrl
 } from '../src/browser.ts'
 
-const $ = id => document.getElementById(id)
+const $ = (id) => document.getElementById(id)
 
 const EXAMPLE_CODEMETA = JSON.stringify(
   {
@@ -92,7 +92,9 @@ function renderResults(results) {
     const failsStrict = selectedOptions().strict && result.warnings.length > 0
     verdict.className = `verdict ${hasErrors || failsStrict ? 'invalid' : 'valid'}`
     const location = result.file ?? '(input)'
-    const version = result.version ? `${result.type.toUpperCase()} ${result.version}` : result.type.toUpperCase()
+    const version = result.version
+      ? `${result.type.toUpperCase()} ${result.version}`
+      : result.type.toUpperCase()
     const origin = result.versionSource
     verdict.textContent = `${hasErrors || failsStrict ? '✗' : '✓'} ${location} — ${version} (${origin}) — ${hasErrors ? 'INVALID' : failsStrict ? 'INVALID (strict)' : 'VALID'}`
     container.append(verdict)
@@ -121,11 +123,26 @@ function renderResults(results) {
 async function lintPasted() {
   const content = $('paste-area').value
   if (content.trim().length === 0) {
-    renderResults([{file: '(pasted)', type: 'codemeta', version: undefined, versionSource: 'unknown', valid: false, errors: [{severity: 'error', rule: 'input', message: 'Paste a document first.'}], warnings: [], infos: []}])
+    renderResults([
+      {
+        file: '(pasted)',
+        type: 'codemeta',
+        version: undefined,
+        versionSource: 'unknown',
+        valid: false,
+        errors: [{severity: 'error', rule: 'input', message: 'Paste a document first.'}],
+        warnings: [],
+        infos: []
+      }
+    ])
     return
   }
   const options = selectedOptions()
-  const result = lintContent(content, {type: options.type, version: options.version, file: '(pasted)'})
+  const result = lintContent(content, {
+    type: options.type,
+    version: options.version,
+    file: '(pasted)'
+  })
   renderResults([result])
 }
 
@@ -189,27 +206,31 @@ function setupTabs() {
 function setupFileInput() {
   const dropZone = $('drop-zone')
   const input = $('file-input')
-  const handle = async file => {
+  const handle = async (file) => {
     if (!file) return
     const content = await file.text()
     const options = selectedOptions()
-    const result = lintContent(content, {type: options.type ?? classifyByName(file.name), version: options.version, file: file.name})
+    const result = lintContent(content, {
+      type: options.type ?? classifyByName(file.name),
+      version: options.version,
+      file: file.name
+    })
     renderResults([result])
   }
   input.addEventListener('change', () => handle(input.files[0]))
   for (const event of ['dragenter', 'dragover']) {
-    dropZone.addEventListener(event, eventObject => {
+    dropZone.addEventListener(event, (eventObject) => {
       eventObject.preventDefault()
       dropZone.classList.add('dragover')
     })
   }
   for (const event of ['dragleave', 'drop']) {
-    dropZone.addEventListener(event, eventObject => {
+    dropZone.addEventListener(event, (eventObject) => {
       eventObject.preventDefault()
       dropZone.classList.remove('dragover')
     })
   }
-  dropZone.addEventListener('drop', eventObject => handle(eventObject.dataTransfer?.files[0]))
+  dropZone.addEventListener('drop', (eventObject) => handle(eventObject.dataTransfer?.files[0]))
 }
 
 populateVersions()

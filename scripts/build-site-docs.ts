@@ -13,7 +13,12 @@ import path from 'node:path'
 import {marked} from 'marked'
 
 const ROOT = path.resolve(import.meta.dirname, '..')
-const outDir = path.resolve(ROOT, process.argv.includes('--out') ? (process.argv[process.argv.indexOf('--out') + 1] ?? 'site') : 'site')
+const outDir = path.resolve(
+  ROOT,
+  process.argv.includes('--out')
+    ? (process.argv[process.argv.indexOf('--out') + 1] ?? 'site')
+    : 'site'
+)
 
 interface DocPage {
   /** Path relative to the repository root. */
@@ -133,14 +138,18 @@ async function main(): Promise<void> {
     const body = String(await marked.parse(markdown, {async: true}))
     const inDocs = page.slug !== 'readme'
     const html = renderTemplate(page.title, body, inDocs)
-    const target = inDocs ? path.join(docsDir, `${page.slug}.html`) : path.join(outDir, `${page.slug}.html`)
+    const target = inDocs
+      ? path.join(docsDir, `${page.slug}.html`)
+      : path.join(outDir, `${page.slug}.html`)
     await writeFile(target, html, 'utf8')
-    const rawTarget = inDocs ? path.join(docsDir, path.basename(page.source)) : path.join(outDir, 'README.md')
+    const rawTarget = inDocs
+      ? path.join(docsDir, path.basename(page.source))
+      : path.join(outDir, 'README.md')
     await writeFile(rawTarget, markdown, 'utf8')
     console.log(`OK ${page.source} -> ${path.relative(outDir, target)}`)
   }
 
-  const items = DOC_PAGES.map(page => {
+  const items = DOC_PAGES.map((page) => {
     const href = page.slug === 'readme' ? '../readme.html' : `${page.slug}.html`
     return `      <li><a href="${href}">${page.title}</a> <span class="hint">(${page.source})</span></li>`
   }).join('\n')
@@ -157,7 +166,7 @@ ${items}
   console.log(`OK docs index -> docs/index.html`)
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error)
   process.exitCode = 1
 })

@@ -9,7 +9,10 @@ const root = path.resolve(import.meta.dirname, '../..')
 const fixtures = path.resolve(import.meta.dirname, '../fixtures')
 const cli = path.join(root, 'dist/cli.js')
 
-function run(args: string[], options: {input?: string; allowFailure?: boolean} = {}): {stdout: string; status: number} {
+function run(
+  args: string[],
+  options: {input?: string; allowFailure?: boolean} = {}
+): {stdout: string; status: number} {
   try {
     const stdout = execFileSync('node', [cli, ...args], {
       cwd: root,
@@ -29,13 +32,13 @@ function run(args: string[], options: {input?: string; allowFailure?: boolean} =
 describe('discovery', () => {
   it('finds files non-recursively', async () => {
     const files = await discover(path.join(fixtures, 'tree/project-a'))
-    const names = files.map(file => path.relative(fixtures, file.path)).sort()
+    const names = files.map((file) => path.relative(fixtures, file.path)).sort()
     expect(names).toEqual(['tree/project-a/CITATION.cff', 'tree/project-a/codemeta.json'])
   })
 
   it('finds nested files recursively but skips node_modules and dot dirs', async () => {
     const files = await discover(path.join(fixtures, 'tree'), {recursive: true})
-    const names = files.map(file => path.relative(fixtures, file.path)).sort()
+    const names = files.map((file) => path.relative(fixtures, file.path)).sort()
     expect(names).toEqual([
       'tree/nested/project-c/codemeta.json',
       'tree/project-a/CITATION.cff',
@@ -54,9 +57,13 @@ describe('discovery', () => {
   })
 
   it('reports no findings when a directory has no metadata files', async () => {
-    const results = await lintDirectory(path.join(fixtures, 'tree/nested/project-c/..'), {recursive: false})
+    const results = await lintDirectory(path.join(fixtures, 'tree/nested/project-c/..'), {
+      recursive: false
+    })
     // nested/ has no direct metadata files
-    const empty = results.filter(result => result.warnings.some(warning => warning.rule === 'discovery/none-found'))
+    const empty = results.filter((result) =>
+      result.warnings.some((warning) => warning.rule === 'discovery/none-found')
+    )
     expect(empty).toHaveLength(1)
   })
 
@@ -70,7 +77,7 @@ describe('discovery', () => {
     )
     expect(results).toHaveLength(2)
     for (const result of results) {
-      const rules = [...result.warnings, ...result.infos].map(finding => finding.rule)
+      const rules = [...result.warnings, ...result.infos].map((finding) => finding.rule)
       expect(rules).toContain('crosscheck/name-mismatch')
       expect(rules).toContain('crosscheck/version-mismatch')
       expect(rules).toContain('crosscheck/license-mismatch')
@@ -87,7 +94,9 @@ describe('CLI', () => {
   })
 
   it('exits 1 for invalid files and prints findings', () => {
-    const {stdout, status} = run([path.join(fixtures, 'cff/invalid-schema.cff')], {allowFailure: true})
+    const {stdout, status} = run([path.join(fixtures, 'cff/invalid-schema.cff')], {
+      allowFailure: true
+    })
     expect(status).toBe(1)
     expect(stdout).toContain('INVALID')
     expect(stdout).toContain('invalid-key')
@@ -126,10 +135,9 @@ describe('CLI', () => {
   })
 
   it('supports forcing a version with --version', () => {
-    const {stdout, status} = run(
-      ['-v', '1.1.0', path.join(fixtures, 'cff/valid-1.2.0.cff')],
-      {allowFailure: true}
-    )
+    const {stdout, status} = run(['-v', '1.1.0', path.join(fixtures, 'cff/valid-1.2.0.cff')], {
+      allowFailure: true
+    })
     expect(status).toBe(1)
     expect(stdout).toContain('cff-version 1.2.0, validating against 1.1.0')
   })
@@ -141,7 +149,12 @@ describe('CLI', () => {
 
   it('applies rule overrides via --rules', () => {
     const {status} = run(
-      ['--rules', JSON.stringify({disable: ['cff/missing-license']}), '-s', path.join(fixtures, 'cff/warnings.cff')],
+      [
+        '--rules',
+        JSON.stringify({disable: ['cff/missing-license']}),
+        '-s',
+        path.join(fixtures, 'cff/warnings.cff')
+      ],
       {allowFailure: true}
     )
     expect(status).toBe(0)
@@ -152,7 +165,10 @@ describe('CLI', () => {
     const rulesFile = path.join(dir, 'rules.json')
     writeFileSync(rulesFile, JSON.stringify({disable: ['cff/missing-license']}), 'utf8')
     try {
-      const {status} = run(['--rules', `@${rulesFile}`, '-s', path.join(fixtures, 'cff/warnings.cff')], {allowFailure: true})
+      const {status} = run(
+        ['--rules', `@${rulesFile}`, '-s', path.join(fixtures, 'cff/warnings.cff')],
+        {allowFailure: true}
+      )
       expect(status).toBe(0)
     } finally {
       rmSync(dir, {recursive: true, force: true})
@@ -172,7 +188,9 @@ describe('CLI', () => {
   })
 
   it('keeps -v as the schema version option', () => {
-    const {stdout, status} = run(['-v', '1.1.0', path.join(fixtures, 'cff/valid-1.2.0.cff')], {allowFailure: true})
+    const {stdout, status} = run(['-v', '1.1.0', path.join(fixtures, 'cff/valid-1.2.0.cff')], {
+      allowFailure: true
+    })
     expect(status).toBe(1)
     expect(stdout).toContain('validating against 1.1.0')
   })
@@ -189,9 +207,14 @@ describe('CLI', () => {
   it('lists all rules as JSON', () => {
     const {stdout, status} = run(['list-rules', '-f', 'json'])
     expect(status).toBe(0)
-    const parsed = JSON.parse(stdout) as {rule: string; group: string; severity: string; description: string}[]
+    const parsed = JSON.parse(stdout) as {
+      rule: string
+      group: string
+      severity: string
+      description: string
+    }[]
     expect(parsed.length).toBeGreaterThanOrEqual(40)
-    expect(parsed.some(info => info.rule === 'crosscheck/name-mismatch')).toBe(true)
+    expect(parsed.some((info) => info.rule === 'crosscheck/name-mismatch')).toBe(true)
   })
 
   it('rejects invalid list-rules formats', () => {
@@ -213,13 +236,17 @@ describe('CLI', () => {
   })
 
   it('fails cleanly on an unparseable file', () => {
-    const {stdout, status} = run([path.join(fixtures, 'cff/invalid-yaml.cff')], {allowFailure: true})
+    const {stdout, status} = run([path.join(fixtures, 'cff/invalid-yaml.cff')], {
+      allowFailure: true
+    })
     expect(status).toBe(1)
     expect(stdout).toContain('Invalid YAML')
   })
 
   it('reports unsupported versions', () => {
-    const {stdout, status} = run([path.join(fixtures, 'cff/unsupported-version.cff')], {allowFailure: true})
+    const {stdout, status} = run([path.join(fixtures, 'cff/unsupported-version.cff')], {
+      allowFailure: true
+    })
     expect(status).toBe(1)
     expect(stdout).toContain('Unsupported cff-version 9.9.9')
   })

@@ -104,7 +104,14 @@ async function main(): Promise<void> {
     await mkdir(targetDir, {recursive: true})
     const raw = await fetchText(source.url)
     const isYaml = source.transform === 'pykwalify'
-    const outFile = path.join(targetDir, isYaml ? 'schema.json' : source.transform === 'spdx-ids' ? 'ids.json' : path.basename(source.url))
+    const outFile = path.join(
+      targetDir,
+      isYaml
+        ? 'schema.json'
+        : source.transform === 'spdx-ids'
+          ? 'ids.json'
+          : path.basename(source.url)
+    )
     let content: string
     if (isYaml) {
       const converted = pykwalifyToJsonSchema(
@@ -114,8 +121,19 @@ async function main(): Promise<void> {
       content = JSON.stringify(converted, null, 2) + '\n'
     } else if (source.transform === 'spdx-ids') {
       // Trim the SPDX list to what the linter needs: the list version and the bare ids.
-      const parsed = JSON.parse(raw) as {licenseListVersion: string; licenses: {licenseId: string}[]}
-      content = JSON.stringify({licenseListVersion: parsed.licenseListVersion, ids: parsed.licenses.map(entry => entry.licenseId)}, null, 2) + '\n'
+      const parsed = JSON.parse(raw) as {
+        licenseListVersion: string
+        licenses: {licenseId: string}[]
+      }
+      content =
+        JSON.stringify(
+          {
+            licenseListVersion: parsed.licenseListVersion,
+            ids: parsed.licenses.map((entry) => entry.licenseId)
+          },
+          null,
+          2
+        ) + '\n'
     } else if (outFile.endsWith('.json')) {
       content = JSON.stringify(JSON.parse(raw), null, 2) + '\n'
     } else {
@@ -133,12 +151,13 @@ async function main(): Promise<void> {
   }
   await writeFile(
     path.join(SCHEMA_DIR, 'sources.json'),
-    JSON.stringify({fetched: new Date().toISOString().slice(0, 10), sources: manifest}, null, 2) + '\n',
+    JSON.stringify({fetched: new Date().toISOString().slice(0, 10), sources: manifest}, null, 2) +
+      '\n',
     'utf8'
   )
 }
 
-main().catch(error => {
+main().catch((error) => {
   console.error(error)
   process.exitCode = 1
 })

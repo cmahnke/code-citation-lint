@@ -14,7 +14,8 @@ export function classifyByName(fileName: string): Format | undefined {
   const lower = fileName.toLowerCase()
   if (lower === CODEMETA_FILE || lower.endsWith('.codemeta.json')) return 'codemeta'
   if (lower === CITATION_FILE.toLowerCase() || lower.endsWith('.cff')) return 'cff'
-  if (lower === 'schemaorg.json' || lower.endsWith('.schemaorg.json') || lower === 'schema.json') return 'schemaorg'
+  if (lower === 'schemaorg.json' || lower.endsWith('.schemaorg.json') || lower === 'schema.json')
+    return 'schemaorg'
   return undefined
 }
 
@@ -34,18 +35,29 @@ export function sniffType(document: unknown): Format | undefined {
 
 /** Converts github blob URLs to raw URLs; other URLs are used as-is. */
 export function normalizeFileUrl(url: string): string {
-  return url.replace(/^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//i, 'https://raw.githubusercontent.com/$1/$2/')
+  return url.replace(
+    /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\//i,
+    'https://raw.githubusercontent.com/$1/$2/'
+  )
 }
 
 /** GitHub repository URL -> owner/repo parts, or undefined. */
-export function parseGitHubRepo(url: string): {owner: string; repo: string; branch?: string} | undefined {
-  const match = /^https?:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\/tree\/([\w./-]+))?\/?$/i.exec(url)
+export function parseGitHubRepo(
+  url: string
+): {owner: string; repo: string; branch?: string} | undefined {
+  const match = /^https?:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)(?:\/tree\/([\w./-]+))?\/?$/i.exec(
+    url
+  )
   if (!match) return undefined
   return {owner: match[1] ?? '', repo: (match[2] ?? '').replace(/\.git$/, ''), branch: match[3]}
 }
 
 /** Resolves the default branch of a GitHub repo, with main/master fallbacks. */
-export async function resolveBranches(repo: {owner: string; repo: string; branch?: string}): Promise<string[]> {
+export async function resolveBranches(repo: {
+  owner: string
+  repo: string
+  branch?: string
+}): Promise<string[]> {
   if (repo.branch !== undefined) return [repo.branch]
   const fallbacks = ['main', 'master']
   try {
@@ -53,7 +65,10 @@ export async function resolveBranches(repo: {owner: string; repo: string; branch
     if (response.ok) {
       const data = (await response.json()) as {default_branch?: string}
       if (typeof data.default_branch === 'string' && data.default_branch.length > 0) {
-        return [data.default_branch, ...fallbacks.filter(candidate => candidate !== data.default_branch)]
+        return [
+          data.default_branch,
+          ...fallbacks.filter((candidate) => candidate !== data.default_branch)
+        ]
       }
     }
   } catch {
@@ -84,9 +99,12 @@ export async function lintUrl(url: string, options: LintOptions = {}): Promise<L
   if (repo !== undefined) {
     for (const branch of await resolveBranches(repo)) {
       const base = `https://raw.githubusercontent.com/${repo.owner}/${repo.repo}/${branch}`
-      const candidates = await Promise.allSettled([fetchText(`${base}/${CODEMETA_FILE}`), fetchText(`${base}/${CITATION_FILE}`)])
+      const candidates = await Promise.allSettled([
+        fetchText(`${base}/${CODEMETA_FILE}`),
+        fetchText(`${base}/${CITATION_FILE}`)
+      ])
       fetched = candidates
-        .map(candidate => (candidate.status === 'fulfilled' ? candidate.value : null))
+        .map((candidate) => (candidate.status === 'fulfilled' ? candidate.value : null))
         .filter((item): item is FetchedFile => item !== null)
       if (fetched.length > 0) break
       lastError = `no ${CODEMETA_FILE} or ${CITATION_FILE} on branch ${branch}`
@@ -101,7 +119,14 @@ export async function lintUrl(url: string, options: LintOptions = {}): Promise<L
 
   if (fetched.length === 0) {
     const result = emptyResult(options.type ?? 'codemeta', url)
-    addFinding(result, finding('error', 'fetch/failed', `Could not fetch ${url}${lastError ? `: ${lastError}` : ''}.`))
+    addFinding(
+      result,
+      finding(
+        'error',
+        'fetch/failed',
+        `Could not fetch ${url}${lastError ? `: ${lastError}` : ''}.`
+      )
+    )
     return [result]
   }
 
@@ -110,7 +135,10 @@ export async function lintUrl(url: string, options: LintOptions = {}): Promise<L
     const parsed = parseDocument(file.content)
     if (parsed.document === undefined) {
       const result = emptyResult(options.type ?? 'codemeta', file.url)
-      addFinding(result, finding('error', 'lint/parse', parsed.error ?? 'Could not parse the document.'))
+      addFinding(
+        result,
+        finding('error', 'lint/parse', parsed.error ?? 'Could not parse the document.')
+      )
       results.push(finalize(result, options))
       continue
     }
@@ -132,13 +160,13 @@ export function applyCrosscheck(
   const filtered =
     rules !== undefined
       ? findings
-          .map(item => applyRuleConfig(item, rules))
+          .map((item) => applyRuleConfig(item, rules))
           .filter((item): item is LintFinding => item !== null)
       : findings
   if (filtered.length > 0) {
     for (const entry of [codemeta, cff]) {
-      entry.result.warnings.push(...filtered.filter(item => item.severity === 'warning'))
-      entry.result.infos.push(...filtered.filter(item => item.severity === 'info'))
+      entry.result.warnings.push(...filtered.filter((item) => item.severity === 'warning'))
+      entry.result.infos.push(...filtered.filter((item) => item.severity === 'info'))
     }
   }
 }

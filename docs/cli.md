@@ -19,12 +19,12 @@ code-citation-lint lint [options] [targets...]
 
 ### Targets
 
-| Target | Behavior |
-|---|---|
-| file | lints the file; type by name (`CITATION.cff`/`*.cff`, `codemeta.json`/`*.codemeta.json`, `schemaorg.json`/`*.schemaorg.json`/`schema.json`, case-insensitively) or content sniffing |
-| directory | auto-discovers `codemeta.json`, `CITATION.cff` and `schemaorg.json` files in the directory; with `-r` recursively (skips `node_modules`, `.git`, `dist`, `dist-browser`, `coverage`, `site`, `.venv`, `venv`, `__pycache__` and dot-directories) |
-| URL | fetches and lints the file |
-| GitHub repository URL | fetches `codemeta.json` and `CITATION.cff` from the default branch (GitHub API, falls back to `main`/`master`) |
+| Target                | Behavior                                                                                                                                                                                                                                         |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| file                  | lints the file; type by name (`CITATION.cff`/`*.cff`, `codemeta.json`/`*.codemeta.json`, `schemaorg.json`/`*.schemaorg.json`/`schema.json`, case-insensitively) or content sniffing                                                              |
+| directory             | auto-discovers `codemeta.json`, `CITATION.cff` and `schemaorg.json` files in the directory; with `-r` recursively (skips `node_modules`, `.git`, `dist`, `dist-browser`, `coverage`, `site`, `.venv`, `venv`, `__pycache__` and dot-directories) |
+| URL                   | fetches and lints the file                                                                                                                                                                                                                       |
+| GitHub repository URL | fetches `codemeta.json` and `CITATION.cff` from the default branch (GitHub API, falls back to `main`/`master`)                                                                                                                                   |
 
 ## Options
 
@@ -130,11 +130,11 @@ code-citation-lint list-rules -f json
 
 ## Exit codes
 
-| Code | Meaning |
-|---|---|
-| 0 | no findings (or only info findings; `init` TODO self-check warnings also exit `0` when there are no errors) |
-| 1 | error findings, warnings under `--strict`, conversion of an invalid document, or an unregistered `--codemeta-version`/`--cff-version` |
-| 2 | input/output errors (missing paths, fetch failures, input/target mismatches, lint with no targets, `--stdin` with positional targets, invalid `--format`/`--type`/`--to`/`--rules`, unknown options, missing arguments, empty-directory `discovery/none-found`, multi-target output that is not a directory or `-`) |
+| Code | Meaning                                                                                                                                                                                                                                                                                                             |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0    | no findings (or only info findings; `init` TODO self-check warnings also exit `0` when there are no errors)                                                                                                                                                                                                         |
+| 1    | error findings, warnings under `--strict`, conversion of an invalid document, or an unregistered `--codemeta-version`/`--cff-version`                                                                                                                                                                               |
+| 2    | input/output errors (missing paths, fetch failures, input/target mismatches, lint with no targets, `--stdin` with positional targets, invalid `--format`/`--type`/`--to`/`--rules`, unknown options, missing arguments, empty-directory `discovery/none-found`, multi-target output that is not a directory or `-`) |
 
 ## JSON output
 

@@ -12,7 +12,11 @@ import {RULE_CATALOG} from './rules.js'
 import {stringify} from 'yaml'
 import type {Format, LintResult, RuleConfig, Severity} from './types.js'
 
-const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {name: string; description: string; version: string}
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8')) as {
+  name: string
+  description: string
+  version: string
+}
 
 interface LintCliOptions {
   type: Format | 'auto'
@@ -43,8 +47,16 @@ interface InitCliOptions {
 
 function parseType(value: string): Format | 'auto' {
   const normalized = value.toLowerCase()
-  if (normalized === 'auto' || normalized === 'codemeta' || normalized === 'cff' || normalized === 'schemaorg') return normalized
-  throw new InvalidArgumentError(`Invalid type "${value}". Use "auto", "codemeta", "cff" or "schemaorg".`)
+  if (
+    normalized === 'auto' ||
+    normalized === 'codemeta' ||
+    normalized === 'cff' ||
+    normalized === 'schemaorg'
+  )
+    return normalized
+  throw new InvalidArgumentError(
+    `Invalid type "${value}". Use "auto", "codemeta", "cff" or "schemaorg".`
+  )
 }
 
 function parseFormat(value: string): 'text' | 'json' {
@@ -55,8 +67,16 @@ function parseFormat(value: string): 'text' | 'json' {
 
 function parseConvertTarget(value: string): ConvertTarget {
   const normalized = value.toLowerCase()
-  if (normalized === 'codemeta' || normalized === 'schemaorg' || normalized === 'zenodo' || normalized === 'cff') return normalized
-  throw new InvalidArgumentError(`Invalid conversion target "${value}". Use "codemeta", "schemaorg", "zenodo" or "cff".`)
+  if (
+    normalized === 'codemeta' ||
+    normalized === 'schemaorg' ||
+    normalized === 'zenodo' ||
+    normalized === 'cff'
+  )
+    return normalized
+  throw new InvalidArgumentError(
+    `Invalid conversion target "${value}". Use "codemeta", "schemaorg", "zenodo" or "cff".`
+  )
 }
 
 function parseConvertTargets(value: string): ConvertTarget[] {
@@ -84,7 +104,9 @@ function parseRules(value: string): RuleConfig {
         throw new InvalidArgumentError(`Could not read rules file: ${(fileError as Error).message}`)
       }
     }
-    throw new InvalidArgumentError(`Rules must be JSON (object with "disable" and/or "severities") or an @file reference.`)
+    throw new InvalidArgumentError(
+      `Rules must be JSON (object with "disable" and/or "severities") or an @file reference.`
+    )
   }
 }
 
@@ -93,14 +115,21 @@ const SEVERITY_ORDER: Record<Severity, number> = {error: 0, warning: 1, info: 2}
 function resultToText(result: LintResult, verbose: boolean): string {
   const lines: string[] = []
   const name = result.file ?? '(input)'
-  const version = result.version ? `${result.type.toUpperCase()} ${result.version}` : result.type.toUpperCase()
-  const origin = result.versionSource === 'specified' ? 'specified' : result.versionSource === 'detected' ? 'detected' : 'unknown'
+  const version = result.version
+    ? `${result.type.toUpperCase()} ${result.version}`
+    : result.type.toUpperCase()
+  const origin =
+    result.versionSource === 'specified'
+      ? 'specified'
+      : result.versionSource === 'detected'
+        ? 'detected'
+        : 'unknown'
   const status = result.valid ? 'VALID' : 'INVALID'
   lines.push(`${name} — ${version} (${origin}) — ${status}`)
   const findings = [
-    ...result.errors.map(item => ({item, symbol: '✗'})),
-    ...result.warnings.map(item => ({item, symbol: '⚠'})),
-    ...result.infos.map(item => ({item, symbol: 'ℹ'}))
+    ...result.errors.map((item) => ({item, symbol: '✗'})),
+    ...result.warnings.map((item) => ({item, symbol: '⚠'})),
+    ...result.infos.map((item) => ({item, symbol: 'ℹ'}))
   ].sort((a, b) => SEVERITY_ORDER[a.item.severity] - SEVERITY_ORDER[b.item.severity])
   for (const {item, symbol} of findings) {
     const location = item.path ? ` ${item.path}` : ''
@@ -117,7 +146,7 @@ function summaryText(results: LintResult[]): string {
   const errors = results.reduce((total, result) => total + result.errors.length, 0)
   const warnings = results.reduce((total, result) => total + result.warnings.length, 0)
   const infos = results.reduce((total, result) => total + result.infos.length, 0)
-  const valid = results.filter(result => result.valid).length
+  const valid = results.filter((result) => result.valid).length
   const parts = [`${results.length} document${results.length === 1 ? '' : 's'}`, `${valid} valid`]
   if (errors > 0) parts.push(`${errors} error${errors === 1 ? '' : 's'}`)
   if (warnings > 0) parts.push(`${warnings} warning${warnings === 1 ? '' : 's'}`)
@@ -127,7 +156,7 @@ function summaryText(results: LintResult[]): string {
 
 function buildResultsJson(results: LintResult[]): string {
   return JSON.stringify(
-    results.map(result => ({
+    results.map((result) => ({
       file: result.file,
       type: result.type,
       version: result.version,
@@ -146,7 +175,7 @@ function computeExitCode(results: LintResult[], strict: boolean): 0 | 1 | 2 {
   // Empty-directory discovery keeps valid=true but is a usage error for the CLI.
   for (const result of results) {
     const all = [...result.errors, ...result.warnings, ...result.infos]
-    if (all.some(item => item.rule === 'discovery/none-found')) {
+    if (all.some((item) => item.rule === 'discovery/none-found')) {
       return 2
     }
   }
@@ -192,7 +221,11 @@ function outputFileName(target: ConvertTarget): string {
   }
 }
 
-function lintOptionsFrom(options: LintCliOptions | ConvertCliOptions): {type?: Format; version?: string; rules?: RuleConfig} {
+function lintOptionsFrom(options: LintCliOptions | ConvertCliOptions): {
+  type?: Format
+  version?: string
+  rules?: RuleConfig
+} {
   return {
     type: options.type === 'auto' ? undefined : options.type,
     version: options.version !== undefined ? normalizeVersion(options.version) : undefined,
@@ -207,7 +240,9 @@ async function runLint(targets: string[], rawOptions: LintCliOptions): Promise<v
     return
   }
   if (targets.length === 0 && !rawOptions.stdin) {
-    console.error('No targets given. Provide file, directory or URL targets, or use --stdin to read from standard input.')
+    console.error(
+      'No targets given. Provide file, directory or URL targets, or use --stdin to read from standard input.'
+    )
     console.error('Usage: code-citation-lint lint [options] [targets...]')
     process.exitCode = 2
     return
@@ -225,7 +260,11 @@ async function runLint(targets: string[], rawOptions: LintCliOptions): Promise<v
   }
 
   for (const target of targets) {
-    const targetResults = await lintTarget(target, {...lintOptionsFrom(rawOptions), recursive: rawOptions.recursive, crosscheck: rawOptions.crosscheck})
+    const targetResults = await lintTarget(target, {
+      ...lintOptionsFrom(rawOptions),
+      recursive: rawOptions.recursive,
+      crosscheck: rawOptions.crosscheck
+    })
     results = results.concat(targetResults)
   }
 
@@ -242,7 +281,11 @@ async function runLint(targets: string[], rawOptions: LintCliOptions): Promise<v
   process.exitCode = computeExitCode(results, rawOptions.strict)
 }
 
-async function runConvert(input: string, output: string, rawOptions: ConvertCliOptions): Promise<void> {
+async function runConvert(
+  input: string,
+  output: string,
+  rawOptions: ConvertCliOptions
+): Promise<void> {
   const lintOptions = lintOptionsFrom(rawOptions)
   let content: string
   try {
@@ -257,7 +300,12 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
   // codemeta inputs convert to cff.
   const parsedInput = parseDocument(content)
   const inputDocument = parsedInput.document
-  if (inputDocument === undefined || inputDocument === null || typeof inputDocument !== 'object' || Array.isArray(inputDocument)) {
+  if (
+    inputDocument === undefined ||
+    inputDocument === null ||
+    typeof inputDocument !== 'object' ||
+    Array.isArray(inputDocument)
+  ) {
     console.error(`${input}: ${parsedInput.error ?? 'Could not parse the document.'}`)
     process.exitCode = 1
     return
@@ -265,19 +313,25 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
   const detected = detectTypeAndVersion(inputDocument)
   const inputType = lintOptions.type ?? detected.type
   const toCff = rawOptions.to.includes('cff')
-  const toOthers = rawOptions.to.filter(target => target !== 'cff')
+  const toOthers = rawOptions.to.filter((target) => target !== 'cff')
   if (toCff && toOthers.length > 0) {
-    console.error(`Cannot mix the "cff" target with other targets for ${input}: cff conversions take a codemeta document and produce CITATION.cff.`)
+    console.error(
+      `Cannot mix the "cff" target with other targets for ${input}: cff conversions take a codemeta document and produce CITATION.cff.`
+    )
     process.exitCode = 2
     return
   }
   if (toCff && inputType !== 'codemeta' && inputType !== 'schemaorg') {
-    console.error(`${input}: converting to cff requires a codemeta document, but the input was detected as ${String(inputType)}.`)
+    console.error(
+      `${input}: converting to cff requires a codemeta document, but the input was detected as ${String(inputType)}.`
+    )
     process.exitCode = 2
     return
   }
   if (!toCff && inputType !== 'cff') {
-    console.error(`${input}: converting to ${toOthers.join('/')} requires a CFF document, but the input was detected as ${String(inputType)}.`)
+    console.error(
+      `${input}: converting to ${toOthers.join('/')} requires a CFF document, but the input was detected as ${String(inputType)}.`
+    )
     process.exitCode = 2
     return
   }
@@ -285,7 +339,9 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
   // The input must be valid before it can be converted
   const inputLint = lintObject(inputDocument, {...lintOptions, type: inputType, file: input})
   if (inputLint.errors.length > 0) {
-    console.error(`${input}: the document could not be converted because it is not a valid ${inputLint.type.toUpperCase()} document:`)
+    console.error(
+      `${input}: the document could not be converted because it is not a valid ${inputLint.type.toUpperCase()} document:`
+    )
     for (const error of inputLint.errors) {
       console.error(`  ✗ ${error.message}${error.path ? ` ${error.path}` : ''}`)
     }
@@ -308,7 +364,10 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
         })
       })
     } catch (error) {
-      conversionFailures.push({message: `${input}: could not convert to ${target}: ${(error as Error).message}`, kind: 'validation'})
+      conversionFailures.push({
+        message: `${input}: could not convert to ${target}: ${(error as Error).message}`,
+        kind: 'validation'
+      })
     }
   }
 
@@ -351,7 +410,10 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
       try {
         mkdirSync(outputDir, {recursive: true})
       } catch (error) {
-        conversionFailures.push({message: `Could not create output directory ${outputDir}: ${(error as Error).message}`, kind: 'io'})
+        conversionFailures.push({
+          message: `Could not create output directory ${outputDir}: ${(error as Error).message}`,
+          kind: 'io'
+        })
         outputDir = undefined
       }
     }
@@ -359,13 +421,25 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
 
   const writeTargets: {target: ConvertTarget; file?: string}[] = outcomes.map(({target}) => ({
     target,
-    ...(outputDir !== undefined ? {file: path.join(outputDir, outputFileName(target))} : isStdout ? {} : {file: output})
+    ...(outputDir !== undefined
+      ? {file: path.join(outputDir, outputFileName(target))}
+      : isStdout
+        ? {}
+        : {file: output})
   }))
 
   // Explicit file output only works for a single target
   if (!isStdout && outcomes.length > 1 && outputDir === undefined) {
-    if (!conversionFailures.some(failure => failure.kind === 'io' && failure.message.includes('requires'))) {
-      conversionFailures.push({message: 'Writing multiple conversion targets requires the output to be a directory (or "-" for stdout).', kind: 'io'})
+    if (
+      !conversionFailures.some(
+        (failure) => failure.kind === 'io' && failure.message.includes('requires')
+      )
+    ) {
+      conversionFailures.push({
+        message:
+          'Writing multiple conversion targets requires the output to be a directory (or "-" for stdout).',
+        kind: 'io'
+      })
     }
   }
   // Avoid writing multiple targets to the same explicit file path.
@@ -382,7 +456,7 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
     return JSON.stringify(document, null, indent) + '\n'
   }
   for (const {target, file} of writeTargets) {
-    const entry = outcomes.find(item => item.target === target)
+    const entry = outcomes.find((item) => item.target === target)
     if (entry === undefined) continue
     const serialized = serialize(entry)
     if (file === undefined) {
@@ -400,7 +474,10 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
           console.error(`Wrote ${target} conversion to ${file}`)
         }
       } catch (error) {
-        conversionFailures.push({message: `Could not write ${file}: ${(error as Error).message}`, kind: 'io'})
+        conversionFailures.push({
+          message: `Could not write ${file}: ${(error as Error).message}`,
+          kind: 'io'
+        })
       }
     }
   }
@@ -424,7 +501,7 @@ async function runConvert(input: string, output: string, rawOptions: ConvertCliO
     for (const failure of conversionFailures) {
       console.error(`✗ ${failure.message}`)
     }
-    process.exitCode = conversionFailures.some(failure => failure.kind === 'io') ? 2 : 1
+    process.exitCode = conversionFailures.some((failure) => failure.kind === 'io') ? 2 : 1
   }
 }
 
@@ -443,13 +520,19 @@ function runInit(dir: string, options: InitCliOptions): void {
     }
     scaffold = scaffoldFromPackageJson(packageJson as Record<string, unknown>)
   } else {
-    console.log(`No package.json found in ${dir} — generating minimal templates with TODO placeholders.`)
+    console.log(
+      `No package.json found in ${dir} — generating minimal templates with TODO placeholders.`
+    )
     scaffold = minimalScaffold()
   }
 
   const targets = [
     {file: path.join(dir, 'CITATION.cff'), content: scaffold.cff, label: 'CITATION.cff'},
-    {file: path.join(dir, 'codemeta.json'), content: JSON.stringify(scaffold.codemeta, null, 2) + '\n', label: 'codemeta.json'}
+    {
+      file: path.join(dir, 'codemeta.json'),
+      content: JSON.stringify(scaffold.codemeta, null, 2) + '\n',
+      label: 'codemeta.json'
+    }
   ]
 
   const writeFailures: string[] = []
@@ -476,22 +559,27 @@ function runInit(dir: string, options: InitCliOptions): void {
   }
 
   // Self-check: the generated files should pass our own linters
-  const results: LintResult[] = [lintContent(scaffold.cff, {type: 'cff', file: 'CITATION.cff'}), lintObject(scaffold.codemeta, {type: 'codemeta', file: 'codemeta.json'})]
+  const results: LintResult[] = [
+    lintContent(scaffold.cff, {type: 'cff', file: 'CITATION.cff'}),
+    lintObject(scaffold.codemeta, {type: 'codemeta', file: 'codemeta.json'})
+  ]
   if (scaffold.cff.includes('TODO')) {
     results[0]?.warnings.push({
       severity: 'warning',
       rule: 'init/todo-placeholder',
-      message: 'Generated CITATION.cff contains TODO placeholders — please review and update the metadata.'
+      message:
+        'Generated CITATION.cff contains TODO placeholders — please review and update the metadata.'
     })
   }
   if (JSON.stringify(scaffold.codemeta).includes('TODO')) {
     results[1]?.warnings.push({
       severity: 'warning',
       rule: 'init/todo-placeholder',
-      message: 'Generated codemeta.json contains TODO placeholders — please review and update the metadata.'
+      message:
+        'Generated codemeta.json contains TODO placeholders — please review and update the metadata.'
     })
   }
-  const allValid = results.every(result => result.valid)
+  const allValid = results.every((result) => result.valid)
   console.log('')
   for (const result of results) {
     console.log(resultToText(result, false))
@@ -509,12 +597,15 @@ async function main(): Promise<void> {
     console.log(pkg.version)
     return
   }
-  const program = new Command()
-    .name('code-citation-lint')
-    .description(pkg.description)
+  const program = new Command().name('code-citation-lint').description(pkg.description)
 
   const addTypeOption = (command: Command): Command =>
-    command.option('-t, --type <type>', 'document type: auto, codemeta, cff or schemaorg', parseType, 'auto')
+    command.option(
+      '-t, --type <type>',
+      'document type: auto, codemeta, cff or schemaorg',
+      parseType,
+      'auto'
+    )
 
   const addVersionOption = (command: Command): Command =>
     command.option('-v, --version <version>', 'force a schema version instead of autodetection')
@@ -545,7 +636,9 @@ async function main(): Promise<void> {
 
   const convert = program
     .command('convert <input> <output>')
-    .description('convert CITATION.cff to CodeMeta/schema.org/Zenodo, or codemeta.json to CITATION.cff')
+    .description(
+      'convert CITATION.cff to CodeMeta/schema.org/Zenodo, or codemeta.json to CITATION.cff'
+    )
   addTypeOption(convert)
   addVersionOption(convert)
   addRulesOption(convert)
@@ -557,8 +650,14 @@ async function main(): Promise<void> {
       parseConvertTargets,
       ['codemeta' as ConvertTarget]
     )
-    .option('--codemeta-version <version>', 'target CodeMeta version for codemeta conversions (default: latest)')
-    .option('--cff-version <version>', 'target CFF version for cff conversions (default: latest released)')
+    .option(
+      '--codemeta-version <version>',
+      'target CodeMeta version for codemeta conversions (default: latest)'
+    )
+    .option(
+      '--cff-version <version>',
+      'target CFF version for cff conversions (default: latest released)'
+    )
     .option('--minify', 'write minified JSON (ignored for the cff target)', false)
     .action(async (input: string, output: string, rawOptions) => {
       await runConvert(input, output, rawOptions as ConvertCliOptions)
@@ -619,7 +718,7 @@ async function main(): Promise<void> {
   await program.parseAsync()
 }
 
-main().catch(error => {
+main().catch((error) => {
   // Commander already printed help output and argument errors; only map the exit code.
   if (error instanceof CommanderError) {
     process.exitCode = error.exitCode === 0 ? 0 : 2

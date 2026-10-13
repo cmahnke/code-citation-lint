@@ -2,7 +2,16 @@ import type {AjvError, LintFinding, LintResult, LintOptions, Format} from './typ
 import {applyRuleConfig} from './registry.js'
 
 export function emptyResult(type: Format, file?: string): LintResult {
-  return {file, type, version: undefined, versionSource: 'unknown', valid: false, errors: [], warnings: [], infos: []}
+  return {
+    file,
+    type,
+    version: undefined,
+    versionSource: 'unknown',
+    valid: false,
+    errors: [],
+    warnings: [],
+    infos: []
+  }
 }
 
 export function addFinding(result: LintResult, finding: LintFinding): void {
@@ -13,11 +22,11 @@ export function addFinding(result: LintResult, finding: LintFinding): void {
 export function finalize(result: LintResult, options: LintOptions): LintResult {
   if (options.rules) {
     const all = [...result.errors, ...result.warnings, ...result.infos]
-      .map(item => applyRuleConfig(item, options.rules))
+      .map((item) => applyRuleConfig(item, options.rules))
       .filter((item): item is LintFinding => item !== null)
-    result.errors = all.filter(item => item.severity === 'error')
-    result.warnings = all.filter(item => item.severity === 'warning')
-    result.infos = all.filter(item => item.severity === 'info')
+    result.errors = all.filter((item) => item.severity === 'error')
+    result.warnings = all.filter((item) => item.severity === 'warning')
+    result.infos = all.filter((item) => item.severity === 'info')
   }
   result.valid = result.errors.length === 0
   return result
@@ -56,7 +65,7 @@ function valueAtPointer(document: unknown, instancePath: string): unknown {
  * for enums, and the offending value for primitive mismatches.
  */
 export function ajvErrorsToFindings(errors: AjvError[], document?: unknown): LintFinding[] {
-  return errors.map(error => {
+  return errors.map((error) => {
     let message = error.message ?? 'Schema validation failed.'
     const params = error.params ?? {}
     let path = error.instancePath
@@ -69,12 +78,18 @@ export function ajvErrorsToFindings(errors: AjvError[], document?: unknown): Lin
     } else {
       const allowedValues = params.allowedValues ?? params.values
       if (Array.isArray(allowedValues)) {
-        message = `must be one of: ${allowedValues.map(value => String(value)).join(', ')}`
+        message = `must be one of: ${allowedValues.map((value) => String(value)).join(', ')}`
       }
       // Name the offending value wherever it is a primitive; for enum/type/
       // pattern/format errors the parent (additionalProperties/required) is noise.
-      const value = document !== undefined && path !== undefined ? valueAtPointer(document, path) : undefined
-      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null) {
+      const value =
+        document !== undefined && path !== undefined ? valueAtPointer(document, path) : undefined
+      if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'boolean' ||
+        value === null
+      ) {
         message += ` (got ${describeValue(value)})`
       }
     }
@@ -87,6 +102,11 @@ export function ajvErrorsToFindings(errors: AjvError[], document?: unknown): Lin
   })
 }
 
-export function finding(severity: 'error' | 'warning' | 'info', rule: string, message: string, path?: string): LintFinding {
+export function finding(
+  severity: 'error' | 'warning' | 'info',
+  rule: string,
+  message: string,
+  path?: string
+): LintFinding {
   return {severity, rule, message, ...(path ? {path} : {})}
 }
