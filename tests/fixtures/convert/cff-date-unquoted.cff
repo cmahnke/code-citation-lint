@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: Unquoted date should normalize to YYYY-MM-DD.
+title: Date Source
+authors:
+  - given-names: Ada
+    family-names: Lovelace
+license: MIT
+version: 1.0.0
+date-released: 2024-06-01
+repository-code: https://github.com/org/dates

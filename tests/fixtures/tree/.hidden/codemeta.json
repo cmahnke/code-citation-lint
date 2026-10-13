@@ -1,0 +1,7 @@
+{
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Hidden Project",
+  "description": "Lives in a dot directory and must be ignored by discovery.",
+  "author": [{"@type": "Person", "givenName": "No", "familyName": "Body"}]
+}

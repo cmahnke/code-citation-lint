@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>code-citation-lint — CodeMeta &amp; CITATION.cff linter</title>
+    <meta name="description" content="Lint and validate CodeMeta (codemeta.json) and Citation File Format (CITATION.cff) documents in your browser." />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>code-citation-lint</h1>
+      <p>
+        Lint and validate <strong>CodeMeta</strong> (<code>codemeta.json</code>) and
+        <strong>Citation File Format</strong> (<code>CITATION.cff</code>) documents — entirely in your
+        browser, no data leaves your machine (except when fetching by URL).
+      </p>
+    </header>
+
+    <main>
+      <section class="panel" aria-label="Input">
+        <h2>Input</h2>
+        <div class="tabs" role="tablist">
+          <button role="tab" id="tab-paste" aria-selected="true" aria-controls="input-paste">Paste</button>
+          <button role="tab" id="tab-file" aria-selected="false" aria-controls="input-file">File</button>
+          <button role="tab" id="tab-url" aria-selected="false" aria-controls="input-url">URL</button>
+        </div>
+
+        <div id="input-paste" role="tabpanel" aria-labelledby="tab-paste">
+          <textarea
+            id="paste-area"
+            rows="12"
+            spellcheck="false"
+            placeholder="Paste the contents of codemeta.json or CITATION.cff here…"
+          ></textarea>
+          <div class="row">
+            <button id="lint-paste" class="primary">Lint pasted document</button>
+            <button id="load-example-codemeta" class="ghost">Example codemeta.json</button>
+            <button id="load-example-cff" class="ghost">Example CITATION.cff</button>
+          </div>
+        </div>
+
+        <div id="input-file" role="tabpanel" aria-labelledby="tab-file" hidden>
+          <div id="drop-zone">Drop a <code>codemeta.json</code> or <code>CITATION.cff</code> file here, or choose one:
+            <input type="file" id="file-input" accept=".json,.cff,.yaml,.yml,text/plain,application/json" />
+          </div>
+        </div>
+
+        <div id="input-url" role="tabpanel" aria-labelledby="tab-url" hidden>
+          <div class="row">
+            <input type="url" id="url-input" placeholder="https://raw.githubusercontent.com/user/repo/main/codemeta.json" />
+            <button id="lint-url" class="primary">Fetch &amp; lint</button>
+          </div>
+          <p class="hint">
+            GitHub repository URLs are expanded to their <code>codemeta.json</code> and <code>CITATION.cff</code>
+            on the default branch. Note: servers without permissive CORS headers will fail in-browser.
+          </p>
+        </div>
+
+        <div class="row options">
+          <label>
+            Type
+            <select id="opt-type">
+              <option value="auto" selected>auto-detect</option>
+              <option value="codemeta">codemeta</option>
+              <option value="cff">cff</option>
+              <option value="schemaorg">schema.org</option>
+            </select>
+          </label>
+          <label>
+            Schema version
+            <select id="opt-version">
+              <option value="" selected>auto-detect</option>
+            </select>
+          </label>
+          <label>
+            <input type="checkbox" id="opt-strict" />
+            Strict (warnings fail)
+          </label>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Results">
+        <h2>Results</h2>
+        <div id="results" class="results">
+          <p class="hint">Lint a document to see results.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        <a href="https://github.com/cmahnke/code-citation-lint">code-citation-lint</a> —
+        supported versions are bundled offline; see the
+        <a href="readme.html">README</a>, the <a href="docs/index.html">documentation</a> and the
+        <a href="docs/api/index.html">API reference</a> for details.
+      </p>
+    </footer>
+
+    <script type="module" src="demo.js"></script>
+  </body>
+</html>

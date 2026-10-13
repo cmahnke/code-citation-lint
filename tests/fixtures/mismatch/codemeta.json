@@ -1,0 +1,10 @@
+{
+  "@context": "https://w3id.org/codemeta/4.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Alpha",
+  "description": "Mismatch fixture.",
+  "author": [{"@type": "Person", "givenName": "Ada", "familyName": "Lovelace"}],
+  "license": "MIT",
+  "codeRepository": "https://github.com/org/alpha",
+  "softwareVersion": "2.0.0"
+}

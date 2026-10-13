@@ -1,0 +1,24 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Schema.org Example",
+  "description": "A synthetic schema.org software document used for testing.",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ada",
+      "familyName": "Lovelace",
+      "@id": "https://orcid.org/0000-0002-1825-0097",
+      "affiliation": {"@type": "Organization", "name": "Res Org"}
+    }
+  ],
+  "license": "https://spdx.org/licenses/MIT",
+  "codeRepository": "https://github.com/org/tool",
+  "programmingLanguage": "TypeScript",
+  "runtimePlatform": "Node.js >= 20",
+  "softwareVersion": "1.0.0",
+  "datePublished": "2024-06-01",
+  "applicationCategory": "DeveloperApplication",
+  "downloadUrl": "https://example.org/tool-1.0.0.tgz",
+  "operatingSystem": "Linux"
+}

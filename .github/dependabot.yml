@@ -1,0 +1,16 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    ignore:
+      # TypeScript 7 is the Go-based compiler holding the npm `latest` dist-tag;
+      # this project intentionally stays on the 6.x line (~6.0.3)
+      - dependency-name: typescript
+        versions:
+          - "7.x"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

@@ -1,0 +1,26 @@
+{
+  "@context": "https://w3id.org/codemeta/4.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Reverse Source",
+  "description": "A synthetic codemeta.json used to test the reverse conversion.",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ada",
+      "familyName": "Lovelace",
+      "email": "ada@example.org",
+      "@id": "https://orcid.org/0000-0002-1825-0097",
+      "affiliation": {"@type": "Organization", "name": "Res Org"}
+    },
+    {"@type": "Organization", "name": "The Org"}
+  ],
+  "license": "https://spdx.org/licenses/MIT",
+  "codeRepository": "https://github.com/org/tool",
+  "url": "https://tool.example.org",
+  "softwareVersion": "2.1.0",
+  "datePublished": "2024-06-01",
+  "identifier": "https://doi.org/10.5281/zenodo.999",
+  "keywords": ["conversion", "reverse"],
+  "readme": "README.md",
+  "issueTracker": "https://github.com/org/tool/issues"
+}

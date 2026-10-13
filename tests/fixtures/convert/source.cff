@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: Conversion Source
+abstract: A synthetic CITATION.cff used to test the conversion output.
+keywords:
+  - conversion
+  - test
+version: 2.1.0
+date-released: "2024-06-01"
+license: MIT
+doi: 10.5281/zenodo.999
+type: software
+repository-code: "https://github.com/org/tool"
+url: "https://tool.example.org"
+authors:
+  - given-names: Ada
+    name-particle: von
+    family-names: Lovelace
+    name-suffix: Jr.
+    alias: ada
+    affiliation: Res Org
+    orcid: "https://orcid.org/0000-0002-1825-0097"
+    email: ada@example.org
+  - name: The Tool Project
+    email: team@example.org
+  - given-names: Grace
+    family-names: Hopper

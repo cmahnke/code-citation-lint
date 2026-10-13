@@ -1,0 +1,21 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-1.0",
+  "@type": "SoftwareSourceCode",
+  "title": "Synonym Source",
+  "description": "CodeMeta 1.0 style document exercising synonym mapping.",
+  "person": {
+    "@type": "Person",
+    "givenName": "Ada",
+    "familyName": "Lovelace",
+    "affiliation": {
+      "@type": "Organization",
+      "@id": "https://example.org/org"
+    }
+  },
+  "licenseId": "MIT",
+  "version": "1.0.0",
+  "dateModified": "2024-06-01T12:00:00Z",
+  "tags": ["synonym", "test"],
+  "codeRepository": "https://github.com/org/synonym",
+  "url": "https://example.org/synonym"
+}

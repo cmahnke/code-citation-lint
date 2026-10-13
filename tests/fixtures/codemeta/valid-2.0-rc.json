@@ -1,0 +1,23 @@
+{
+  "@context": "https://raw.githubusercontent.com/codemeta/codemeta/2.0-rc/codemeta.jsonld",
+  "@type": "SoftwareSourceCode",
+  "name": "Synthetic CodeMeta Example",
+  "description": "A synthetic codemeta.json document used for testing.",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ada",
+      "familyName": "Lovelace",
+      "id": "https://orcid.org/0000-0002-1825-0097"
+    }
+  ],
+  "license": "MIT",
+  "codeRepository": "https://github.com/synthetic/example",
+  "softwareVersion": "1.0.0",
+  "datePublished": "2021-01-01",
+  "keywords": [
+    "synthetic",
+    "test"
+  ],
+  "contIntegration": "https://example.com/ci"
+}

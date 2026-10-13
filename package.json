@@ -1,0 +1,84 @@
+{
+  "name": "@projektemacher/code-citation-lint",
+  "version": "0.1.0",
+  "description": "Lint and validate CodeMeta (codemeta.json) and Citation File Format (CITATION.cff) metadata files. All released schema versions supported, schemas bundled for offline and browser use.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Christoph Mahnke (https://orcid.org/)",
+  "homepage": "https://github.com/cmahnke/code-citation-lint#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cmahnke/code-citation-lint.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cmahnke/code-citation-lint/issues"
+  },
+  "keywords": [
+    "codemeta",
+    "citation",
+    "cff",
+    "citation-file-format",
+    "lint",
+    "validator",
+    "json-schema",
+    "metadata",
+    "research-software"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/browser.d.ts",
+      "import": "./dist/browser.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "code-citation-lint": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:page": "esbuild page/main.js --bundle --minify --outfile=dist-browser/demo.js --define:process.env.NODE_ENV='\"production\"'",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "docs": "typedoc",
+    "self-lint": "node dist/cli.js .",
+    "schemas:fetch": "tsx scripts/fetch-schemas.ts",
+    "schemas:generate": "tsx scripts/generate-codemeta-schemas.ts",
+    "build:docs-site": "tsx scripts/build-site-docs.ts"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "commander": "^15.0.0",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "esbuild": "^0.28.2",
+    "eslint": "^10.12.0",
+    "marked": "^18.1.1",
+    "prettier": "^3.9.10",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15",
+    "typedoc": "^0.28.20",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^5.0.4"
+  }
+}

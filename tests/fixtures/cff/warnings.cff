@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+message: Minimal but missing recommended fields.
+title: Sparse CFF Example
+authors:
+  - given-names: Ada
+    family-names: Lovelace
+version: 2.0.0

@@ -1,0 +1,8 @@
+{
+  "@context": "https://schema.org/version/15.0/",
+  "@type": "SoftwareSourceCode",
+  "name": "Versioned Context Example",
+  "description": "Uses a versioned schema.org context.",
+  "author": [{"@type": "Person", "givenName": "Ada", "familyName": "Lovelace"}],
+  "license": "https://spdx.org/licenses/Apache-2.0"
+}

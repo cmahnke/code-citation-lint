@@ -1,0 +1,44 @@
+{
+  "title": "Conversion Source",
+  "creators": [
+    {
+      "affiliation": "Res Org",
+      "name": "von Lovelace Jr., Ada",
+      "orcid": "0000-0002-1825-0097"
+    },
+    {
+      "name": "The Tool Project"
+    },
+    {
+      "name": "Hopper, Grace"
+    }
+  ],
+  "description": "A synthetic CITATION.cff used to test the conversion output.",
+  "keywords": [
+    "conversion",
+    "test"
+  ],
+  "license": {
+    "id": "MIT"
+  },
+  "publication_date": "2024-06-01",
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.999",
+      "relation": "isSupplementedBy",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/org/tool",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://tool.example.org",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ],
+  "version": "2.1.0",
+  "upload_type": "software"
+}

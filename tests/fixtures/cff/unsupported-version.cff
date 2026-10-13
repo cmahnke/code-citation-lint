@@ -1,0 +1,6 @@
+cff-version: 9.9.9
+message: This version does not exist.
+title: Unsupported CFF Example
+authors:
+  - given-names: Ada
+    family-names: Lovelace

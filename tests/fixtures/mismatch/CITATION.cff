@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: Beta
+authors:
+  - given-names: Ada
+    family-names: Lovelace
+license: Apache-2.0
+repository-code: https://github.com/org/beta
+version: 1.0.0
+date-released: 2024-01-01

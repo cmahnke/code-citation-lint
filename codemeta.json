@@ -1,0 +1,39 @@
+{
+  "@context": "https://w3id.org/codemeta/4.0",
+  "@type": "SoftwareSourceCode",
+  "name": "code-citation-lint",
+  "description": "Linter, validator and converter for CodeMeta (codemeta.json), Citation File Format (CITATION.cff) and schema.org software metadata documents. Supports all released schema versions with bundled schemas for offline and browser use, and converts CITATION.cff to CodeMeta and schema.org.",
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Christoph",
+      "familyName": "Mahnke"
+    }
+  ],
+  "license": "MIT",
+  "codeRepository": "https://github.com/cmahnke/code-citation-lint",
+  "issueTracker": "https://github.com/cmahnke/code-citation-lint/issues",
+  "softwareVersion": "0.1.0",
+  "datePublished": "2026-10-13",
+  "developmentStatus": "https://www.repostatus.org/#active",
+  "keywords": [
+    "codemeta",
+    "citation-file-format",
+    "cff",
+    "schema.org",
+    "lint",
+    "validator",
+    "converter",
+    "json-schema",
+    "metadata",
+    "research-software"
+  ],
+  "programmingLanguage": ["TypeScript", "JavaScript"],
+  "runtimePlatform": "Node.js >= 20",
+  "operatingSystem": ["Linux", "macOS", "Windows"],
+  "readme": "https://github.com/cmahnke/code-citation-lint#readme",
+  "buildInstructions": "https://github.com/cmahnke/code-citation-lint#development",
+  "continuousIntegration": "https://github.com/cmahnke/code-citation-lint/actions",
+  "isAccessibleForFree": true,
+  "applicationCategory": "DeveloperApplication"
+}

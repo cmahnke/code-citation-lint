@@ -1,0 +1,8 @@
+{
+  "@context": "https://w3id.org/codemeta/3.0",
+  "@type": "SoftwareSourceCode",
+  "name": "Nested Project C",
+  "description": "Lives in a nested directory for discovery tests.",
+  "author": [{"@type": "Person", "givenName": "Grace", "familyName": "Hopper"}],
+  "license": "MIT"
+}

@@ -1,0 +1,232 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f6f7f9;
+  --panel: #ffffff;
+  --text: #1c2430;
+  --muted: #5b6673;
+  --accent: #2f6fed;
+  --error: #c22f2f;
+  --warning: #b57a10;
+  --info: #2a7d84;
+  --ok: #2c8a43;
+  --border: #d8dee6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14181e;
+    --panel: #1d232b;
+    --text: #e7ecf2;
+    --muted: #97a2ae;
+    --accent: #6ea0ff;
+    --error: #ff7a7a;
+    --warning: #ffbe4d;
+    --info: #6cc7cf;
+    --ok: #6fd68a;
+    --border: #333c47;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 60rem;
+  padding: 1rem 1.25rem 3rem;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+header h1 {
+  margin: 0.5rem 0 0.25rem;
+  font-size: 1.6rem;
+}
+
+header p {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.tabs button {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  padding: 0.35rem 0.9rem;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+}
+
+.tabs button[aria-selected='true'] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+textarea,
+input[type='url'] {
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+button.primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.options {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border);
+}
+
+.options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+select {
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+}
+
+#drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--muted);
+}
+
+#drop-zone.dragover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.results .verdict {
+  font-weight: 600;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  margin: 0 0 0.75rem;
+}
+
+.verdict.valid {
+  color: var(--ok);
+  background: color-mix(in srgb, var(--ok) 12%, transparent);
+}
+
+.verdict.invalid {
+  color: var(--error);
+  background: color-mix(in srgb, var(--error) 12%, transparent);
+}
+
+.finding {
+  border-left: 3px solid var(--border);
+  padding: 0.35rem 0.6rem;
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+  background: var(--bg);
+  border-radius: 0 6px 6px 0;
+}
+
+.finding.error {
+  border-left-color: var(--error);
+}
+
+.finding.warning {
+  border-left-color: var(--warning);
+}
+
+.finding.info {
+  border-left-color: var(--info);
+}
+
+.finding .rule {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+}
+
+.finding .path {
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+footer {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+footer a,
+.hint a {
+  color: var(--accent);
+}

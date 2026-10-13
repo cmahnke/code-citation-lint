@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: If you use code-citation-lint in your research or tooling, please cite it using these metadata.
+title: code-citation-lint
+abstract: Linter, validator and converter for CodeMeta (codemeta.json), Citation File Format (CITATION.cff) and schema.org software metadata, supporting all released schema versions.
+authors:
+  - given-names: Christoph
+    family-names: Mahnke
+version: 0.1.0
+date-released: "2026-10-13"
+license: MIT
+repository-code: "https://github.com/cmahnke/code-citation-lint"
+keywords:
+  - codemeta
+  - citation-file-format
+  - cff
+  - schema.org
+  - lint
+  - validator
+  - converter
+  - json-schema
+  - metadata
+  - research-software

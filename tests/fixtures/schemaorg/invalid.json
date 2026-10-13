@@ -1,0 +1,9 @@
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareSourceCode",
+  "name": "Broken Schema.org Example",
+  "description": "Uses an unknown property and a malformed date.",
+  "author": [{"@type": "Person", "givenName": "Ada"}],
+  "datePublished": "June 2024",
+  "thisIsNotASchemaOrgTerm": true
+}

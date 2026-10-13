@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: Project B
+authors:
+  - name: Project B Team
+version: 0.1.0
+date-released: 2023-01-01
+license: Apache-2.0

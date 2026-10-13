@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: Test license-url fallback.
+title: License URL Source
+authors:
+  - given-names: Ada
+    family-names: Lovelace
+license-url: https://example.org/custom-license
+version: 1.0.0
+date-released: 2024-06-01

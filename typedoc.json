@@ -1,0 +1,10 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "code-citation-lint",
+  "entryPoints": ["src/index.ts", "src/browser.ts"],
+  "out": "docs/api",
+  "readme": "none",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "tsconfig": "tsconfig.json"
+}

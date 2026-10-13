@@ -1,0 +1,104 @@
+{
+  "@context": {
+      "schema":"http://schema.org/",
+      "codemeta": "https://codemeta.github.io/terms/",
+
+      "SoftwareSourceCode":"schema:SoftwareSourceCode",
+      "SoftwareApplication":"schema:SoftwareApplication",
+      "URL":"schema:URL",
+      "Text":"schema:Text",
+      "Person": "schema:Person",
+      "Organization": "schema:Organization",
+
+      "id": "@id",
+      "type": "@type",
+      
+      "codeRepository": "schema:codeRepository",
+      "programmingLanguage": "schema:programmingLanguage",
+      "runtimePlatform": "schema:runtimePlatform",
+      "targetProduct": "schema:targetProduct",
+      "applicationCategory": "schema:applicationCategory",
+      "applicationSubCategory": "schema:applicationSubCategory",
+      "downloadUrl": "schema:downloadUrl",
+      "fileSize": "schema:fileSize",
+      "installUrl": "schema:installUrl",
+      "memoryRequirements": "schema:memoryRequirements",
+      "operatingSystem": "schema:operatingSystem",
+      "permissions": "schema:permissions",
+      "processorRequirements": "schema:processorRequirements",
+      "releaseNotes": "schema:releaseNotes",
+      "softwareHelp": "schema:softwareHelp",
+      "softwareRequirements": {"@id": "schema:softwareRequirements", "@type": "@id" },
+      "softwareVersion": "schema:softwareVersion",
+      "storageRequirements": "schema:storageRequirements",
+      "supportingData": "schema:supportingData",
+      "citation": "schema:citation",
+      "contributor": "schema:contributor",
+      "copyrightHolder": "schema:copyrightHolder",
+      "copyrightYear": "schema:copyrightYear",
+      "creator": "schema:creator",
+      "dateCreated": {"@id": "schema:dateCreated", "@type": "schema:Date" },
+      "dateModified":  {"@id": "schema:dateModified", "@type": "schema:Date" },
+      "datePublished":  {"@id": "schema:datePublished", "@type": "schema:Date" },
+      "editor": "schema:editor",
+      "encoding": "schema:encoding",
+      "fileFormat": "schema:fileFormat",
+      "funder": "schema:funder",
+      "keywords": "schema:keywords",
+      "license": "schema:license",
+      "producer": "schema:producer",
+      "provider": "schema:provider",
+      "publisher": "schema:publisher",
+      "sponsor": "schema:sponsor",
+      "version": "schema:version",
+      "description": "schema:description",
+      "identifier": "schema:identifier",
+      "name": "schema:name",
+      "sameAs": "schema:sameAs",
+      "url": "schema:url",
+      "givenName": "schema:givenName",
+      "familyName": "schema:familyName",
+      "email": "schema:email",
+      "affiliation": "schema:affiliation",
+      "address": "schema:address",
+      "position": "schema:position",
+      "author": {
+        "@id": "schema:author",
+        "@container": "@list"
+      },
+      "softwareSuggestions": {
+         "@id":"codemeta:softwareSuggestions",
+         "@type": "@id"
+      },
+      "contIntegration": {
+         "@id":"codemeta:contIntegration"
+      },
+      "buildInstructions": {
+         "@id":"codemeta:buildInstructions"
+      },
+      "developmentStatus": {
+          "@id":"codemeta:developmentStatus"
+      },
+      "embargoDate": {
+         "@id":"codemeta:embargoDate",
+         "@type": "schema:Date"
+      },
+      "funding": {
+          "@id": "codemeta:funding"
+      },
+      "readme": {
+         "@id":"codemeta:readme"
+      },
+      "issueTracker": {
+         "@id":"codemeta:issueTracker"
+         },
+      "referencePublication": {
+        "@id": "codemeta:referencePublication",
+        "@type": "@id"
+      },
+      "maintainer": {
+        "@id": "codemeta:maintainer",
+        "@type": "@id"
+      }
+  }
+}

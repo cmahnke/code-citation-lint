@@ -1,0 +1,9 @@
+{
+  "@context": ["https://w3id.org/codemeta/3.0", "http://schema.org/"],
+  "@type": "SoftwareSourceCode",
+  "name": "Array Context Example",
+  "description": "Declares the CodeMeta context inside an array.",
+  "author": [{"@type": "Person", "givenName": "Ada", "familyName": "Lovelace"}],
+  "license": "MIT",
+  "codeRepository": "https://github.com/synthetic/example"
+}

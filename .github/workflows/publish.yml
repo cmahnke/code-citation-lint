@@ -1,0 +1,80 @@
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  validate:
+    name: Validate (lint, typecheck, tests, self-lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm run test
+      - run: npm run self-lint
+
+  # Registry deployment only starts after the full validation job passed
+  publish:
+    name: Publish to npm and GitHub Packages
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm run build
+
+      - name: Read package version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> "$GITHUB_ENV"
+
+      - name: Guard — check if the version already exists on npm
+        id: guard-npm
+        env:
+          PACKAGE_NAME: '@projektemacher/code-citation-lint'
+        run: |
+          if npm view "${PACKAGE_NAME}@${VERSION}" version > /dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to npm
+        if: steps.guard-npm.outputs.exists != 'true'
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Guard result — version already on npm
+        if: steps.guard-npm.outputs.exists == 'true'
+        run: echo "Version ${VERSION} already exists on the npm registry — skipping publish (pass)."
+
+      # GitHub Packages requires the npm scope to match the repository owner.
+      # This repository lives under github.com/cmahnke, so the package is
+      # republished there as @cmahnke/code-citation-lint (the npm package is
+      # @projektemacher/code-citation-lint). If the repository moves to a
+      # projektemacher GitHub organization, adjust GH_SCOPE accordingly.
+      - name: Publish to GitHub Packages
+        env:
+          GH_SCOPE: cmahnke
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm pkg set name="@${GH_SCOPE}/code-citation-lint"
+          echo "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+          echo "@${GH_SCOPE}:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          npm publish
